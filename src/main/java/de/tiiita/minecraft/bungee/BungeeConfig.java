@@ -8,6 +8,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -22,6 +24,7 @@ import java.util.logging.Level;
 public class BungeeConfig {
     private final Plugin plugin;
 
+    private final String name;
     private Configuration fileConfiguration;
     private final File file;
 
@@ -29,6 +32,8 @@ public class BungeeConfig {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public BungeeConfig(String name, Plugin plugin) {
         this.plugin = plugin;
+        this.name = name;
+
         File path = plugin.getDataFolder();
         file = new File(path, name);
         if (!file.exists()) {
@@ -45,6 +50,8 @@ public class BungeeConfig {
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "There was an error loading the config!");
         }
+
+        loadConfig();
     }
 
     public File getFile() {
@@ -122,5 +129,22 @@ public class BungeeConfig {
 
     public void setDouble(String path, double value) {
         fileConfiguration.set(path, value);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void loadConfig() {
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdir();
+        }
+
+        File file = new File(plugin.getDataFolder(), name);
+
+        if (!file.exists()) {
+            try (InputStream in = plugin.getResourceAsStream(name)) {
+                Files.copy(in, file.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package de.tiiita;
 
 public class Main {
-
     public void start() {
 
     }

@@ -4,12 +4,13 @@ package de.tiiita.util;
  * Simple class that automatically reports when a method is called in the wrong thread.
  */
 public class ThreadChecker {
+    private static final String DEFAULT_MAIN_THREAD = "main";
 
     /**
      * Ad this to you methods body, and it will automatically throw an IllegalStateException if the method is called in the main thread.
      */
     public static void asyncOnly() {
-        asyncOnly("main");
+        asyncOnly(DEFAULT_MAIN_THREAD);
     }
 
     /**
@@ -17,7 +18,7 @@ public class ThreadChecker {
      * a different thread than the main thread.
      */
     public static void syncOnly() {
-        syncOnly("main");
+        syncOnly(DEFAULT_MAIN_THREAD);
     }
 
     /**
