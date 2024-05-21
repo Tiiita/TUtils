@@ -2,6 +2,7 @@
 
 In this project are some classes, annotations, etc. that people need to code faster. Add this repository as a dependency
 to get access to all these helpers in your own code.
+Here are also some minecraft related stuff such as item builder or etc.
 
 Maven:
 ```xml
