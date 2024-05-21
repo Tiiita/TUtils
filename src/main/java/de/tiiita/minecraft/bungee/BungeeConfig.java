@@ -24,6 +24,7 @@ import java.util.logging.Level;
 public class BungeeConfig {
     private final Plugin plugin;
 
+    private boolean loaded;
     private final String name;
     private Configuration fileConfiguration;
     private final File file;
@@ -133,6 +134,8 @@ public class BungeeConfig {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadConfig() {
+        if (loaded)
+            throw new IllegalStateException("Config is already loaded");
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdir();
         }
@@ -146,5 +149,7 @@ public class BungeeConfig {
                 throw new RuntimeException(e);
             }
         }
+
+        loaded = true;
     }
 }

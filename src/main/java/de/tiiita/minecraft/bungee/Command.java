@@ -26,10 +26,21 @@ public abstract class Command extends net.md_5.bungee.api.plugin.Command {
     public abstract void onExecute(CommandSender sender, String[] args);
 
     public void sendUsage(CommandSender sender) {
-        sender.sendMessage(new TextComponent(USAGE_MESSAGE));
+        sendMessage(sender, USAGE_MESSAGE);
     }
 
     public void sendNoPermissions(CommandSender sender) {
-        sender.sendMessage(new TextComponent(NO_PERMS_MESSAGE));
+        sendMessage(sender, NO_PERMS_MESSAGE);
+    }
+    public void sendMessage(CommandSender sender, String message) {
+        sender.sendMessage(new TextComponent(message));
+    }
+
+    public String getNoPermsMessage() {
+        return NO_PERMS_MESSAGE;
+    }
+
+    public String getUsageMessage() {
+        return USAGE_MESSAGE;
     }
 }
