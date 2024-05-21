@@ -6,9 +6,9 @@ to get access to all these helpers in your own code.
 Maven:
 ```xml
 <dependency>
-<groupId>de.tiiita</groupId>
-<artifactId>tutils</artifactId>
-<version>1.0.0</version>
+    <groupId>de.tiiita</groupId>
+    <artifactId>tutils</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 
