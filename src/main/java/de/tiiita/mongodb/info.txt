@@ -1,0 +1,2 @@
+The entire API is programmed by earomc (https://github.com/earomc).
+I may change some things but the base is made by him.
