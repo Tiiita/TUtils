@@ -106,6 +106,7 @@ public class ItemBuilder {
 
     /**
      * Sets the lore but applies a formatter function to each lore line.
+     *
      * @param formatter The formatter function that will be applied to each line.
      * @param loreLines The array of "raw" lore lines.
      * @return The ItemBuilder itself.
@@ -117,6 +118,7 @@ public class ItemBuilder {
 
     /**
      * Sets the lore but applies a formatter function to each lore line.
+     *
      * @param formatter The formatter function that will be applied to each line.
      * @param loreLines The list of "raw" lore lines.
      * @return The ItemBuilder itself.
@@ -130,7 +132,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder appendLore(String ... loreLines) {
+    public ItemBuilder appendLore(String... loreLines) {
         if (meta.hasLore()) {
             List<String> lore = meta.getLore();
             ArrayList<String> newLore = new ArrayList<>(lore);
@@ -189,6 +191,7 @@ public class ItemBuilder {
      * Often the final method used with an ItemBuilder.
      * Applies the internal {@link ItemMeta} to the {@link ItemStack} and returns it.
      * You can technically still use the ItemBuilder object after using this method.
+     *
      * @return Returns the itemStack with everything applied.
      */
     public ItemStack build() {
