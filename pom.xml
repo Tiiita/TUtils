@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.tiiita</groupId>
-    <artifactId>TUtils</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>tutils</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -22,4 +22,11 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Tiiita Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Tiiita/TUtils</url>
+        </repository>
+    </distributionManagement>
 </project>
