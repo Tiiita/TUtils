@@ -36,7 +36,7 @@ public class MojangProfileFetcher {
         connection.setRequestMethod("GET");
 
         int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
+        if (responseCode != HttpURLConnection.HTTP_OK) {
             ProxyServer.getInstance().getLogger().log(Level.WARNING,
                     "Did not get response code as expected (mojang profile fetcher) (" + responseCode + ")");
             return null;
@@ -67,7 +67,7 @@ public class MojangProfileFetcher {
         try {
             return fetchData(identifier);
         } catch (Exception e) {
-            Logger.logError("Error while fetching mojang name or uuid: " + e.getMessage());
+            Logger.logError("Error while fetching mojang. Used identifier: " + e.getMessage());
             return "/";
         }
     }
@@ -88,7 +88,7 @@ public class MojangProfileFetcher {
         } catch (UserNotFoundException e) {
             name = null;
         } catch (Exception e) {
-            Logger.logError("Error while fetching mojang name or uuid: " + e.getMessage());
+            Logger.logError("Error while fetching mojang. Used identifier: " + e.getMessage());
             name = null;
         }
 

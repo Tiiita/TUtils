@@ -1,4 +1,4 @@
-package de.tiiita.minecraft.bungee;
+package de.tiiita.minecraft.bungee.config;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -78,10 +79,9 @@ public class BungeeConfig {
 
     }
 
-    public String color(String path) {
-        return ChatColor.translateAlternateColorCodes('&', path);
+    public String color(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
-
 
     public Configuration getSection(String path) {
         return fileConfiguration.getSection(path);
@@ -92,9 +92,20 @@ public class BungeeConfig {
 
     public String getString(String path, String placeholder, String replacement) {
         return getString(path).replaceAll(placeholder, replacement);
-
     }
 
+    public String getStringColored(String path) {
+        return color(getString(path));
+    }
+
+    public List<String> getStringListColored(String path) {
+        List<String> coloredStrings = new ArrayList<>();
+        for (String string : getStringList(path)) {
+            coloredStrings.add(color(string));
+        }
+
+        return coloredStrings;
+    }
     public List<String> getStringList(String path) {
         return fileConfiguration.getStringList(path);
     }

@@ -16,7 +16,7 @@ public class ThreadChecker {
     }
 
     /**
-     * Ad this to you methods body, and it will automatically print a warning if the method is called in
+     * Add this to you methods body, and it will automatically print a warning if the method is called in
      * a different thread than the main thread.
      */
     public static void syncOnly() {
@@ -24,7 +24,7 @@ public class ThreadChecker {
     }
 
     /**
-     * Ad this to you methods body, and it will automatically print a warning if the method is called in the main thread.
+     * Add this to you methods body, and it will automatically print a warning if the method is called in the main thread.
      *
      * @param mainThread the name of the main thread. If the main thread is called "main" use {@link #asyncOnly()}
      */
@@ -35,7 +35,7 @@ public class ThreadChecker {
     }
 
     /**
-     * Ad this to you methods body, and it will automatically print a warning if the method is called in
+     * Add this to you methods body, and it will automatically print a warning if the method is called in
      * a different thread than the main thread.
      *
      * @param mainThread the name of the main thread. If the main thread is called "main" use {@link #syncOnly()}
