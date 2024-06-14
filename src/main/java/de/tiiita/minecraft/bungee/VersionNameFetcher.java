@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class VersionNameFetcher {
-    private final String URL = "https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/pc/common/protocolVersions.json";
+    private static final String URL = "https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/pc/common/protocolVersions.json";
 
     /**
      * ONLY USE ASYNC!
@@ -19,7 +19,7 @@ public class VersionNameFetcher {
      * @param protocolId the protocol id of the player
      * @return the found version name or null if nothing was found
      */
-    public String getVersionName(int protocolId) {
+    public static String getVersionName(int protocolId) {
         ThreadChecker.asyncOnly();
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(URL).openConnection();
