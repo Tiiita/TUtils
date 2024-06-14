@@ -3,9 +3,11 @@ package de.tiiita.minecraft.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import de.tiiita.logger.Logger;
+import de.tiiita.util.StringUtils;
 import de.tiiita.util.ThreadChecker;
 import net.md_5.bungee.api.ProxyServer;
 import org.jetbrains.annotations.Nullable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,9 +25,10 @@ public class MojangProfileFetcher {
     /**
      * Fetches the name or uuid from the mojang api by using the opposite identifier.
      * This code blocks the thread for about 250-500 ms!
+     *
      * @param identifier the name or uuid of the player.
      * @return the name of the player.
-     * @throws IOException if no name was found or an error occurred an IOEx will be thrown.
+     * @throws IOException           if no name was found or an error occurred an IOEx will be thrown.
      * @throws UserNotFoundException if no user was found with the given identifier.
      */
     @Nullable
@@ -41,18 +44,12 @@ public class MojangProfileFetcher {
                     "Did not get response code as expected (mojang profile fetcher) (" + responseCode + ")");
             return null;
         }
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-        JsonElement value = getFromJson(response.toString(), getKeyByIdentifier(identifier));
+        String response = StringUtils.asString(connection.getInputStream());
+        JsonElement value = getFromJson(response, getKeyByIdentifier(identifier));
 
         if (value == null) {
-            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(response.toString(), "errorMessage"));
+            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(response, "errorMessage"));
         }
         return value.getAsString();
 
@@ -60,6 +57,7 @@ public class MojangProfileFetcher {
 
     /**
      * This fetches the name or uuid and handles the exception so the user gets a name safely.
+     *
      * @param identifier the name or uuid of the user. You get the opposite identifier.
      * @return the found identifier or "/" if no user was found or an exception was thrown. The exception will be printed to the console.
      */
@@ -77,6 +75,7 @@ public class MojangProfileFetcher {
      * This method only prints out the error if it is a real error and not just a user that wasn't found.
      * Use this method if you are not sure if the user with the given uuid exists, but you still want to get the name
      * if the user exists.
+     *
      * @param identifier the uuid of the user.
      * @return the name as string or null if no user was found.
      */
@@ -84,7 +83,7 @@ public class MojangProfileFetcher {
     public static String fetchDataOrNull(String identifier) {
         String name;
         try {
-           name = fetchData(identifier);
+            name = fetchData(identifier);
         } catch (UserNotFoundException e) {
             name = null;
         } catch (Exception e) {
@@ -96,7 +95,7 @@ public class MojangProfileFetcher {
     }
 
     private static JsonElement getFromJson(String json, String key) {
-        return JsonParser.parseString(json).getAsJsonObject().get(key);
+        return StringUtils.toJson(json).getAsJsonObject().get(key);
     }
 
     private static String getUrlByIdIdentifier(String identifier) {
@@ -104,10 +103,11 @@ public class MojangProfileFetcher {
             return UUID_URL;
         } else return NAME_URL;
     }
+
     private static String getKeyByIdentifier(String identifier) {
-      if (isUuid(identifier)) {
-          return "name";
-      } else return "id";
+        if (isUuid(identifier)) {
+            return "name";
+        } else return "id";
     }
 
     private static boolean isUuid(String identifier) {
@@ -118,6 +118,5 @@ public class MojangProfileFetcher {
         } catch (IllegalArgumentException e) {
             return false;
         }
-
     }
 }

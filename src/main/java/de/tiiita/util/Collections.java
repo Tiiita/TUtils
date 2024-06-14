@@ -15,6 +15,7 @@ public abstract class Collections {
      * @param <T> The object type.
      */
     @Nullable
+    @SuppressWarnings("unchecked")
     public static <T> T getRandom(Collection<T> collection) {
         Object[] array = collection.toArray();
 

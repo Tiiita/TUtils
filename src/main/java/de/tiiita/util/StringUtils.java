@@ -1,11 +1,16 @@
 package de.tiiita.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class InputStreamUtil {
+public class StringUtils {
+
     public static String asString(InputStream stream) {
         BufferedReader input = new BufferedReader(new InputStreamReader(stream));
         String inputLine;
@@ -21,5 +26,9 @@ public class InputStreamUtil {
         }
 
         return string.toString();
+    }
+
+    public static JsonObject toJson(String json) {
+        return JsonParser.parseString(json).getAsJsonObject();
     }
 }
