@@ -87,10 +87,10 @@ public class DateTimeUtils {
 
             switch (unit) {
                 case "y":
-                    totalDays += value * 365;
+                    totalDays += value * 365L;
                     break;
                 case "mo":
-                    totalDays += value * 30;
+                    totalDays += value * 30L;
                     break;
                 case "d":
                     totalDays += value;
