@@ -20,7 +20,7 @@ public abstract class HttpRequest {
         }
     }
 
-    protected void addRequestProperty(String key, String value) {
+    public void addRequestProperty(String key, String value) {
         connection.addRequestProperty(key, value);
     }
 

@@ -14,6 +14,7 @@ public class PostHttpRequest extends HttpRequest {
     @Override
     protected void configureConnection() throws ProtocolException {
         connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
     }
 
     public void sendPostData(String postData) {
