@@ -1,30 +1,30 @@
-package de.tiiita.util;
+package de.tiiita.util.http;
 
 import com.google.gson.JsonElement;
+import de.tiiita.util.StringUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class HttpRequest {
-    private final String requestMethod;
-    private final HttpURLConnection connection;
+public abstract class HttpRequest {
+    protected final HttpURLConnection connection;
 
-    public HttpRequest(String requestMethod, URL url) {
-        this.requestMethod = requestMethod;
+    public HttpRequest(String url) {
         try {
-            this.connection = (HttpURLConnection) url.openConnection();
+            this.connection = (HttpURLConnection) new URL(url).openConnection();
             configureConnection();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void configureConnection() throws ProtocolException {
-        connection.setRequestMethod(requestMethod);
-        connection.setReadTimeout(3500);
+    protected void addRequestProperty(String key, String value) {
+        connection.addRequestProperty(key, value);
     }
+
+    protected abstract void configureConnection() throws ProtocolException;
 
     public JsonElement getJsonValue(String key) {
         if (connection == null)
@@ -35,9 +35,10 @@ public class HttpRequest {
             return StringUtils.toJson(response).getAsJsonObject().get(key);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            connection.disconnect();
         }
     }
-
 
     public HttpURLConnection getConnection() {
         return connection;

@@ -1,17 +1,15 @@
 package de.tiiita.minecraft.util;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import de.tiiita.logger.Logger;
-import de.tiiita.util.HttpRequest;
+import de.tiiita.util.http.GetHttpRequest;
+import de.tiiita.util.http.HttpRequest;
 import de.tiiita.util.StringUtils;
 import de.tiiita.util.ThreadChecker;
 import net.md_5.bungee.api.ProxyServer;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
@@ -35,7 +33,7 @@ public class MojangProfileFetcher {
     @Nullable
     private static String fetchData(String identifier) throws IOException {
         ThreadChecker.asyncOnly();
-        HttpRequest httpRequest = new HttpRequest("GET", new URL(String.format(getUrlByIdIdentifier(identifier), identifier)));
+        HttpRequest httpRequest = new GetHttpRequest(String.format(getUrlByIdIdentifier(identifier), identifier));
         int responseCode = httpRequest.getConnection().getResponseCode();
 
         if (responseCode != HttpURLConnection.HTTP_OK) {
