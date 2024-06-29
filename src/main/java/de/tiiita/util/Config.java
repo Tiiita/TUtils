@@ -25,6 +25,7 @@ public class Config {
             throw new RuntimeException(e);
         }
     }
+
     public void setString(String path, String value) {
         config.put(path, value);
     }
@@ -40,7 +41,9 @@ public class Config {
     public int getInt(String path) {
         return (int) config.get(path);
     }
-
+    public boolean getBoolean(String path) {
+        return (boolean) config.get(path);
+    }
 
     private void loadYaml(InputStream inputStream, Map<String, Object> target, String pathPrefix) throws IOException {
         Yaml yaml = new Yaml();

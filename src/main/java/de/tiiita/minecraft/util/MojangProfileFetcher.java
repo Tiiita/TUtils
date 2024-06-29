@@ -3,6 +3,7 @@ package de.tiiita.minecraft.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import de.tiiita.logger.Logger;
+import de.tiiita.util.HttpRequest;
 import de.tiiita.util.StringUtils;
 import de.tiiita.util.ThreadChecker;
 import net.md_5.bungee.api.ProxyServer;
@@ -34,25 +35,21 @@ public class MojangProfileFetcher {
     @Nullable
     private static String fetchData(String identifier) throws IOException {
         ThreadChecker.asyncOnly();
-        HttpURLConnection connection = (HttpURLConnection) new URL(String.format(getUrlByIdIdentifier(identifier), identifier)).openConnection();
-        connection.setReadTimeout(2000);
-        connection.setRequestMethod("GET");
+        HttpRequest httpRequest = new HttpRequest("GET", new URL(String.format(getUrlByIdIdentifier(identifier), identifier)));
+        int responseCode = httpRequest.getConnection().getResponseCode();
 
-        int responseCode = connection.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
             ProxyServer.getInstance().getLogger().log(Level.WARNING,
                     "Did not get response code as expected (mojang profile fetcher) (" + responseCode + ")");
             return null;
         }
 
-        String response = StringUtils.asString(connection.getInputStream());
-        JsonElement value = getFromJson(response, getKeyByIdentifier(identifier));
+        JsonElement value = httpRequest.getJsonValue(getKeyByIdentifier(identifier));
 
         if (value == null) {
-            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(response, "errorMessage"));
+            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + httpRequest.getJsonValue("errorMessage").getAsString());
         }
         return value.getAsString();
-
     }
 
     /**
