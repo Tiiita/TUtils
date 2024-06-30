@@ -1,8 +1,8 @@
 package de.tiiita.util;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.json.simple.JSONObject;
 
 import java.io.*;
 
@@ -25,7 +25,7 @@ public class StringUtils {
         return string.toString();
     }
 
-    public static JsonObject toJson(String json) {
+    public static JsonObject fromJsonString(String json) {
         return JsonParser.parseString(json).getAsJsonObject();
     }
 }

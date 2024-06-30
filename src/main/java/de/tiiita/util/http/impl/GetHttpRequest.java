@@ -1,4 +1,6 @@
-package de.tiiita.util.http;
+package de.tiiita.util.http.impl;
+
+import de.tiiita.util.http.HttpRequest;
 
 import java.net.ProtocolException;
 

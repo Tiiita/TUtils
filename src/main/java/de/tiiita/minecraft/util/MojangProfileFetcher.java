@@ -2,7 +2,7 @@ package de.tiiita.minecraft.util;
 
 import com.google.gson.JsonElement;
 import de.tiiita.logger.Logger;
-import de.tiiita.util.http.GetHttpRequest;
+import de.tiiita.util.http.impl.GetHttpRequest;
 import de.tiiita.util.http.HttpRequest;
 import de.tiiita.util.StringUtils;
 import de.tiiita.util.ThreadChecker;
@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -90,7 +89,7 @@ public class MojangProfileFetcher {
     }
 
     private static JsonElement getFromJson(String json, String key) {
-        return StringUtils.toJson(json).getAsJsonObject().get(key);
+        return StringUtils.fromJsonString(json).getAsJsonObject().get(key);
     }
 
     private static String getUrlByIdIdentifier(String identifier) {

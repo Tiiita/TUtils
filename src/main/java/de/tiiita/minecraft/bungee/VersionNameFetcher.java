@@ -7,8 +7,6 @@ import de.tiiita.util.ThreadChecker;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 
 public class VersionNameFetcher {
     private static final String URL = "https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/pc/common/protocolVersions.json";
@@ -27,7 +25,7 @@ public class VersionNameFetcher {
             connection.setReadTimeout(2500);
 
             String response = StringUtils.asString(connection.getInputStream());
-            return StringUtils.toJson(response).get("version").getAsString();
+            return StringUtils.fromJsonString(response).get("version").getAsString();
         } catch (IOException e) {
            throw new RuntimeException(e);
         }
