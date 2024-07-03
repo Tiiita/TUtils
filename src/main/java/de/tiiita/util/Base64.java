@@ -14,7 +14,7 @@ public class Base64 {
         try {
             String serialized = serialize(obj);
             byte[] bytes = java.util.Base64.getEncoder().encode(serialized.getBytes());
-            return new String(bytes, StandardCharsets.UTF_8).substring(0, 64);
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Error encoding object", e);
         }
