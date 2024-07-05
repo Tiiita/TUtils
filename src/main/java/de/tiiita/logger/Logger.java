@@ -25,6 +25,9 @@ public abstract class Logger {
     public static void logDebug(String message) {
         System.out.println(ANSI_BLUE + getPrefix("deb") + " " + message + ANSI_RESET);
     }
+    public static void makeSpace() {
+        System.out.println(" ");
+    }
 
     //[22:01:59] [INFO]:
     private static String getPrefix(String logType) {
