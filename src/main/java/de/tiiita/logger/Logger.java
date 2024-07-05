@@ -5,35 +5,52 @@ import java.time.Instant;
 import java.util.Date;
 
 public abstract class Logger {
+    private static boolean colors = true;
     private static final String ANSI_YELLOW = "\u001B[38;2;166;138;13m";
     private static final String ANSI_RED = "\u001B[38;2;226;77;71m";
     private static final String ANSI_BLUE = "\u001B[38;2;42;125;211m";
     private static final String ANSI_RESET = "\u001B[0m";
 
     public static void logInfo(String message) {
-        System.out.println(ANSI_RESET + getPrefix("inf") + " " + message + ANSI_RESET);
+        log(message, ANSI_RESET, "inf");
     }
 
     public static void logWarning(String message) {
-        System.out.println(ANSI_YELLOW + getPrefix("war") + " " + message + ANSI_RESET);
+        log(message, ANSI_YELLOW, "war");
 
     }
+
     public static void logError(String message) {
-        System.out.println(ANSI_RED + getPrefix("err") + " " + message + ANSI_RESET);
+        log(message, ANSI_RED, "err");
     }
 
     public static void logDebug(String message) {
-        System.out.println(ANSI_BLUE + getPrefix("deb") + " " + message + ANSI_RESET);
+        log(message, ANSI_BLUE, "deb");
     }
+
     public static void makeSpace() {
         System.out.println(" ");
     }
 
-    //[22:01:59] [INFO]:
+    private static void log(String message, String ansiColor, String prefix) {
+        if (colors) {
+            System.out.println(ansiColor + getPrefix(prefix) + " " + message + ANSI_RESET);
+        } else System.out.println(getPrefix(prefix) + " " + message);
+    }
+
+    //Example: [22:01:59] [INFO]:
     private static String getPrefix(String logType) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
         String time = simpleDateFormat.format(Date.from(Instant.now()));
 
-        return "[" + time + "] [" + logType.toUpperCase() + "]" ;
+        return "[" + time + "] [" + logType.toUpperCase() + "]";
+    }
+
+    public static void disableColors() {
+        colors = false;
+    }
+
+    public static void enableColors() {
+        colors = true;
     }
 }
