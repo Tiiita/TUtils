@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class JsonStringBuilder {
 
-    private final Map<String, String> map = new HashMap<>();
+    private final Map<String, Object> map = new HashMap<>();
 
     public static JsonStringBuilder instantiate() {
         return new JsonStringBuilder();
@@ -17,16 +17,29 @@ public class JsonStringBuilder {
         return this;
     }
 
+    public JsonStringBuilder add(String key, JsonStringBuilder nestedBuilder) {
+        map.put(key, nestedBuilder.build());
+        return this;
+    }
+
     public String build() {
-        StringBuilder stringBuilder =  new StringBuilder();
-        Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
         stringBuilder.append("{");
         while (iterator.hasNext()) {
-            Map.Entry<String, String> entry = iterator.next();
+            Map.Entry<String, Object> entry = iterator.next();
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            stringBuilder.append("\"").append(key).append("\":\"").append(value).append("\"");
+            stringBuilder.append("\"").append(key).append("\":");
+
+            if (value instanceof String) {
+                stringBuilder.append("\"").append(value).append("\"");
+            } else if (value instanceof JsonStringBuilder) {
+                stringBuilder.append(((JsonStringBuilder) value).build());
+            } else {
+                throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
+            }
 
             if (iterator.hasNext()) {
                 stringBuilder.append(",");

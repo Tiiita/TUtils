@@ -37,23 +37,27 @@ public class MojangProfileFetcher {
         ThreadChecker.asyncOnly();
 
         HttpGet httpGet = new HttpGet(String.format(getUrlByIdIdentifier(identifier), identifier));
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(httpGet);
 
-        int responseCode = response.getStatusLine().getStatusCode();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            CloseableHttpResponse response = httpClient.execute(httpGet);
 
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            ProxyServer.getInstance().getLogger().log(Level.WARNING,
-                    "Did not get response code as expected (mojang profile fetcher) (" + responseCode + ")");
-            return null;
+            int responseCode = response.getStatusLine().getStatusCode();
+
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                ProxyServer.getInstance().getLogger().log(Level.WARNING,
+                        "Did not get response code as expected (mojang profile fetcher) (" + responseCode + ")");
+                return null;
+            }
+
+            JsonElement value = getFromJson(EntityUtils.toString(response.getEntity()), getKeyByIdentifier(identifier));
+            response.close();
+
+            if (value == null) {
+                throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(EntityUtils.toString(response.getEntity()), "errorMessage"));
+            }
+
+            return value.getAsString();
         }
-
-        JsonElement value = getFromJson(EntityUtils.toString(response.getEntity()), getKeyByIdentifier(identifier));
-
-        if (value == null) {
-            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(EntityUtils.toString(response.getEntity()), "errorMessage"));
-        }
-        return value.getAsString();
     }
 
     /**
