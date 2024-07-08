@@ -2,11 +2,14 @@ package de.tiiita.minecraft.util;
 
 import com.google.gson.JsonElement;
 import de.tiiita.logger.Logger;
-import de.tiiita.util.http.impl.GetHttpRequest;
-import de.tiiita.util.http.HttpRequest;
 import de.tiiita.util.StringUtils;
 import de.tiiita.util.ThreadChecker;
 import net.md_5.bungee.api.ProxyServer;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -32,8 +35,12 @@ public class MojangProfileFetcher {
     @Nullable
     private static String fetchData(String identifier) throws IOException {
         ThreadChecker.asyncOnly();
-        HttpRequest httpRequest = new GetHttpRequest(String.format(getUrlByIdIdentifier(identifier), identifier));
-        int responseCode = httpRequest.getConnection().getResponseCode();
+
+        HttpGet httpGet = new HttpGet(String.format(getUrlByIdIdentifier(identifier), identifier));
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpResponse response = httpClient.execute(httpGet);
+
+        int responseCode = response.getStatusLine().getStatusCode();
 
         if (responseCode != HttpURLConnection.HTTP_OK) {
             ProxyServer.getInstance().getLogger().log(Level.WARNING,
@@ -41,10 +48,10 @@ public class MojangProfileFetcher {
             return null;
         }
 
-        JsonElement value = httpRequest.getJsonValue(getKeyByIdentifier(identifier));
+        JsonElement value = getFromJson(EntityUtils.toString(response.getEntity()), getKeyByIdentifier(identifier));
 
         if (value == null) {
-            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + httpRequest.getJsonValue("errorMessage").getAsString());
+            throw new UserNotFoundException("User with identifier (uuid or name): " + identifier + " not found. Error Message: " + getFromJson(EntityUtils.toString(response.getEntity()), "errorMessage"));
         }
         return value.getAsString();
     }

@@ -1,4 +1,4 @@
-package de.tiiita.util.http;
+package de.tiiita.util;
 
 import java.util.HashMap;
 import java.util.Iterator;
