@@ -18,7 +18,7 @@ public class JsonStringBuilder {
     }
 
     public JsonStringBuilder add(String key, JsonStringBuilder nestedBuilder) {
-        map.put(key, nestedBuilder.build());
+        map.put(key, nestedBuilder);
         return this;
     }
 

@@ -1,5 +1,6 @@
 package de.tiiita.util;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -26,24 +27,35 @@ public class Config {
         }
     }
 
-    public void setString(String path, String value) {
-        config.put(path, value);
-    }
-
-    public void setInt(String path, int value) {
-        config.put(path, value);
-    }
-
     public String getString(String path) {
-        return (String) config.get(path);
+        return get(path, String.class);
     }
 
     public int getInt(String path) {
-        return (int) config.get(path);
+        return get(path, Integer.class);
     }
+
     public boolean getBoolean(String path) {
-        return (boolean) config.get(path);
+        return get(path, Boolean.class);
     }
+
+    public void setString(String path, String value) {
+        set(path, value);
+    }
+
+    public void setInt(String path, int value) {
+        set(path, value);
+    }
+
+
+    public <T> T get(String path, Class<T> clazz) {
+        return clazz.cast(config.get(path));
+    }
+
+    public void set(String path, Object value) {
+        config.put(path, value);
+    }
+
 
     private void loadYaml(InputStream inputStream, Map<String, Object> target, String pathPrefix) throws IOException {
         Yaml yaml = new Yaml();
