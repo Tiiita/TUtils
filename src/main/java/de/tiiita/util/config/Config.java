@@ -15,6 +15,7 @@ import java.util.Map;
 public class Config {
     private final Map<String, Object> config;
     private final String filePath;
+    private final String CONFIG_ID = "config-id";
 
     Config(String filePath) {
         this.filePath = filePath;
@@ -107,10 +108,13 @@ public class Config {
         }
     }
 
-    void addConfigVersion(int version) {
-        String path = "config-version";
-        removeEntry(path);
-        setInt(path, version);
+    void addConfigId(int id) {
+        removeEntry(CONFIG_ID);
+        setInt(CONFIG_ID, id);
+    }
+
+    public int getConfigId() {
+        return getInt(CONFIG_ID);
     }
 
     private String getFileExtension(String filePath) {
