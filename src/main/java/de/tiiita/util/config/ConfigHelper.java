@@ -9,6 +9,7 @@ public class ConfigHelper {
         try {
             config.load(filePath);
             config.addConfigId(id);
+            config.save();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
