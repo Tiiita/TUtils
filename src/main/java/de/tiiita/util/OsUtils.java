@@ -4,15 +4,18 @@ package de.tiiita.util;
 public class OsUtils {
     public static OsType identifyOsType() {
         String osName = System.getProperty("os.name");
-
-        if (osName.contains("win")) {
+        if (osName.toUpperCase().contains("WIN")) {
             return OsType.WINDOWS;
-        } else if (osName.contains("mac")) {
+
+        } else if (osName.toUpperCase().contains("MAC")) {
             return OsType.MAC_OS;
-        } else if (osName.contains("nix") || osName.contains("nux")) {
+
+        } else if (osName.toUpperCase().contains("NIX") || osName.contains("NUX")) {
             return OsType.LINUX;
-        } else if (osName.contains("cros")) {
+
+        } else if (osName.toUpperCase().contains("CROS")) {
             return OsType.CHROME_OS;
+
         } else {
             return OsType.UNKNOWN;
         }
