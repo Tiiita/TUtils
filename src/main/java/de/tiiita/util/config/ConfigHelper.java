@@ -16,7 +16,7 @@ public class ConfigHelper {
     }
 
     public static void checkRightConfig(Config config, int id) {
-        if (config.getConfigId() == id)
+        if (config.getConfigId() != id)
             throw new IllegalArgumentException("Wrong config, config-id: " + config.getConfigId()
                     + ", wanted config-id: " + id);
     }
