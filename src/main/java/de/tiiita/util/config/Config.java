@@ -1,6 +1,5 @@
-package de.tiiita.util;
+package de.tiiita.util.config;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -17,14 +16,9 @@ public class Config {
     private final Map<String, Object> config;
     private final String filePath;
 
-    public Config(String filePath) {
+    Config(String filePath) {
         this.filePath = filePath;
         config = new HashMap<>();
-        try {
-            load(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public String getString(String path) {
@@ -55,6 +49,10 @@ public class Config {
     public void set(String path, Object value) {
         config.put(path, value);
     }
+    public void removeEntry(String path) {
+        config.remove(path);
+        //You have to save after this!
+    }
 
 
     private void loadYaml(InputStream inputStream, Map<String, Object> target, String pathPrefix) throws IOException {
@@ -80,7 +78,7 @@ public class Config {
         }
     }
 
-    public void load(String fileName) throws IOException {
+    void load(String fileName) throws IOException {
         File configFile = new File(fileName);
         if (configFile.exists()) {
             // If the config file exists, load it from the file
@@ -107,6 +105,12 @@ public class Config {
                 }
             }
         }
+    }
+
+    void addConfigVersion(int version) {
+        String path = "config-version";
+        removeEntry(path);
+        setInt(path, version);
     }
 
     private String getFileExtension(String filePath) {
