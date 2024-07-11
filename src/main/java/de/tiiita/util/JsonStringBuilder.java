@@ -1,7 +1,7 @@
 package de.tiiita.util;
-
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class JsonStringBuilder {
@@ -22,6 +22,11 @@ public class JsonStringBuilder {
         return this;
     }
 
+    public JsonStringBuilder add(String key, List<Object> array) {
+        map.put(key, array);
+        return this;
+    }
+
     public String build() {
         StringBuilder stringBuilder = new StringBuilder();
         Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
@@ -37,6 +42,24 @@ public class JsonStringBuilder {
                 stringBuilder.append("\"").append(value).append("\"");
             } else if (value instanceof JsonStringBuilder) {
                 stringBuilder.append(((JsonStringBuilder) value).build());
+            } else if (value instanceof List) {
+                stringBuilder.append("[");
+                List<Object> array = (List<Object>) value;
+                Iterator<Object> arrayIterator = array.iterator();
+                while (arrayIterator.hasNext()) {
+                    Object arrayValue = arrayIterator.next();
+                    if (arrayValue instanceof String) {
+                        stringBuilder.append("\"").append(arrayValue).append("\"");
+                    } else if (arrayValue instanceof JsonStringBuilder) {
+                        stringBuilder.append(((JsonStringBuilder) arrayValue).build());
+                    } else {
+                        throw new IllegalArgumentException("Unsupported array value type: " + arrayValue.getClass());
+                    }
+                    if (arrayIterator.hasNext()) {
+                        stringBuilder.append(",");
+                    }
+                }
+                stringBuilder.append("]");
             } else {
                 throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
             }
