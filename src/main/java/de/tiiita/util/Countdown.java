@@ -1,6 +1,7 @@
 package de.tiiita.util;
 
 import com.google.common.escape.ArrayBasedUnicodeEscaper;
+import de.tiiita.util.json.JsonStringBuilder;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +30,6 @@ public class Countdown {
     public synchronized void start() {
         if (running)
             throw new IllegalStateException("Cannot start time because it is already running.");
-
         countdownThread = new Thread(() -> {
             while (counter > 0) {
                 counter--;
