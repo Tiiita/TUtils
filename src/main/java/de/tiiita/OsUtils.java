@@ -1,4 +1,4 @@
-package de.tiiita.util;
+package de.tiiita;
 
 //Untested
 public class OsUtils {

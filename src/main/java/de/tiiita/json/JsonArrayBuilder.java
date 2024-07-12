@@ -1,4 +1,4 @@
-package de.tiiita.util.json;
+package de.tiiita.json;
 
 import java.util.HashSet;
 import java.util.Set;

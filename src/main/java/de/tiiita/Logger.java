@@ -1,5 +1,12 @@
-package de.tiiita.logger;
+package de.tiiita;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileOwnerAttributeView;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -10,6 +17,16 @@ public abstract class Logger {
     private static final String ANSI_RED = "\u001B[38;2;226;77;71m";
     private static final String ANSI_BLUE = "\u001B[38;2;42;125;211m";
     private static final String ANSI_RESET = "\u001B[0m";
+    private static final File logFile;
+
+    static {
+        try {
+            logFile = Files.createTempFile("logs", ".log").toFile();
+            logFile.deleteOnExit();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void logInfo(String message) {
         log(message, ANSI_RESET, "inf");
@@ -33,9 +50,26 @@ public abstract class Logger {
     }
 
     private static void log(String message, String ansiColor, String prefix) {
+        String nonColorLog = getPrefix(prefix) + " " + message;
         if (colors) {
             System.out.println(ansiColor + getPrefix(prefix) + " " + message + ANSI_RESET);
-        } else System.out.println(getPrefix(prefix) + " " + message);
+        } else System.out.println(nonColorLog);
+
+        writeToLog(nonColorLog + "\n");
+    }
+
+
+    private static void writeToLog(String string) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(logFile)) {
+            fileOutputStream.write(string.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static File getLogFile() {
+      return logFile;
     }
 
     //Example: [22:01:59] [INFO]:

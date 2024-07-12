@@ -1,4 +1,4 @@
-package de.tiiita.util;
+package de.tiiita;
 
 import org.jetbrains.annotations.Nullable;
 

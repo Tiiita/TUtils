@@ -1,4 +1,4 @@
-package de.tiiita.util;
+package de.tiiita;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

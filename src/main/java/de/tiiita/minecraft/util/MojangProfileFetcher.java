@@ -1,9 +1,9 @@
 package de.tiiita.minecraft.util;
 
 import com.google.gson.JsonElement;
-import de.tiiita.logger.Logger;
-import de.tiiita.util.StringUtils;
-import de.tiiita.util.ThreadChecker;
+import de.tiiita.Logger;
+import de.tiiita.StringUtils;
+import de.tiiita.ThreadChecker;
 import net.md_5.bungee.api.ProxyServer;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

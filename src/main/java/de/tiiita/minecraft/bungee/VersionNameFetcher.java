@@ -1,8 +1,8 @@
 package de.tiiita.minecraft.bungee;
 
 
-import de.tiiita.util.StringUtils;
-import de.tiiita.util.ThreadChecker;
+import de.tiiita.StringUtils;
+import de.tiiita.ThreadChecker;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

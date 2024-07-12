@@ -1,6 +1,4 @@
-package de.tiiita.util;
-
-import de.tiiita.logger.Logger;
+package de.tiiita;
 
 /**
  * Simple class that automatically reports when a method is called in the wrong thread.

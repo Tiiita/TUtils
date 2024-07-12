@@ -1,4 +1,4 @@
-package de.tiiita.util.config;
+package de.tiiita.config;
 
 import java.io.IOException;
 
