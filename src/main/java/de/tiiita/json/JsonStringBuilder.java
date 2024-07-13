@@ -54,6 +54,7 @@ public class JsonStringBuilder implements JsonElementBuilder {
      *                      being called because you pass in a string!
      * @return this updated instance.
      */
+    @NotNull
     public JsonStringBuilder add(@NotNull String key, @NotNull JsonStringBuilder nestedBuilder) {
         map.put(key, nestedBuilder.map);
         return this;
