@@ -45,6 +45,10 @@ public class JsonStringBuilder implements JsonElementBuilder {
                 JsonElementBuilder builder = (JsonElementBuilder) value;
                 jsonStringBuilder.append("\"").append(key).append("\":").append(builder.build()).append(",");
             }
+
+            if (value instanceof  Number) {
+                jsonStringBuilder.append("\"").append(key).append("\":").append(value).append(",");
+            }
         });
 
         //Delete last ','

@@ -27,13 +27,13 @@ import java.util.Set;
         StringBuilder arrayStringBuilder = new StringBuilder();
         arrayStringBuilder.append("[");
 
-        values.forEach(s -> {
-            if (s instanceof String) {
-                arrayStringBuilder.append("\"").append(s).append("\"").append(",");
+        values.forEach(item -> {
+            if (item instanceof String) {
+                arrayStringBuilder.append("\"").append(item).append("\"").append(",");
             }
 
-            if (s instanceof JsonStringBuilder) {
-                arrayStringBuilder.append(s).append(",");
+            if (item instanceof JsonStringBuilder || item instanceof Number) {
+                arrayStringBuilder.append(item).append(",");
             }
         });
 
