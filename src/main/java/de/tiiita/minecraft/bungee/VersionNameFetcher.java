@@ -13,6 +13,7 @@ public class VersionNameFetcher {
 
     /**
      * ONLY USE ASYNC!
+     * <p>
      * Get the understandable version name by the bungee protocol id
      * @param protocolId the protocol id of the player
      * @return the found version name or null if nothing was found
