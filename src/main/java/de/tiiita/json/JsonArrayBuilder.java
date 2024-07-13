@@ -16,6 +16,11 @@ import java.util.Set;
         return this;
     }
 
+     public JsonArrayBuilder add(Number value) {
+         values.add(value);
+         return this;
+     }
+
     //Example: [{"key": "value", "key2": "value2"}]
     public JsonArrayBuilder add(JsonStringBuilder jsonStringBuilder) {
         values.add(jsonStringBuilder);

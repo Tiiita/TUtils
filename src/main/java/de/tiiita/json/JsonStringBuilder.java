@@ -16,6 +16,11 @@ public class JsonStringBuilder implements JsonElementBuilder {
         return this;
     }
 
+    public JsonStringBuilder add(String key, Number value) {
+        map.put(key, value);
+        return this;
+    }
+
     public JsonStringBuilder add(String key, JsonStringBuilder nestedBuilder) {
         map.put(key, nestedBuilder.map);
         return this;
