@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class DateTimeUtils {
 
-    public static String formatDurationBetweenDates(OffsetDateTime startDateTime, OffsetDateTime endDateTime) {
+    public static String formatDurationBetweenDates(OffsetDateTime startDateTime, OffsetDateTime endDateTime, boolean secondsEnabled) {
         Period period = Period.between(startDateTime.toLocalDate(), endDateTime.toLocalDate());
         Duration duration = Duration.between(startDateTime.toLocalTime(), endDateTime.toLocalTime());
 
@@ -25,6 +25,7 @@ public class DateTimeUtils {
         long days = period.getDays();
         long hours = duration.toHours();
         long minutes = duration.toMinutes() % 60;
+        long seconds = duration.getSeconds();
 
         StringBuilder formattedDuration = new StringBuilder();
         if (years != 0) {
@@ -40,8 +41,13 @@ public class DateTimeUtils {
             formattedDuration.append(hours).append("h ");
         }
         if (minutes != 0) {
-            formattedDuration.append(minutes).append("m");
+            formattedDuration.append(minutes).append("m ");
         }
+
+        if (secondsEnabled && seconds != 0) {
+           formattedDuration.append(seconds).append("s");
+        }
+
 
         return formattedDuration.toString().trim();
     }
