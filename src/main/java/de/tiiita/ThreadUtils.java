@@ -48,6 +48,7 @@ public class ThreadUtils {
 
     /**
      * Override the main thread if the program renames the main thread to a custom name.
+     *
      * @param mainThread the new main thread name, where the application runs in.
      */
     public static void setMainThread(String mainThread) {
@@ -59,18 +60,28 @@ public class ThreadUtils {
      * so it does not block infinitely if the condition is never true.
      * <p>
      * It uses 500-millisecond sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
-     * @param condition the condition for stopping the thread sleep.
+     *
+     * @param condition  the condition for stopping the thread sleep.
      * @param maxSeconds the maximum time the thread can sleep. If this duration exceeds, this method returns if
      *                   the condition was not true until.
      */
     public static void sleepUntil(Supplier<Boolean> condition, int maxSeconds) {
-        try {
-            for (int i = 0; i < maxSeconds; i++) {
-                if (condition.get()) {
-                    Thread.sleep(500);
-                    return;
-                }
+        for (int i = 0; i < maxSeconds; i++) {
+            if (condition.get()) {
+                sleep(500);
+                return;
             }
+        }
+    }
+
+    /**
+     * This is just a method that uses {@link Thread#sleep(long)} for you, so you do not have to
+     * do that annoying try-catch any time!
+     * @param millis the milliseconds you want the current thread to sleep.
+     */
+    public static void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
