@@ -67,7 +67,7 @@ public class ThreadUtils {
      */
     public static void sleepUntil(Supplier<Boolean> condition, int maxSeconds) {
         for (int i = 0; i < maxSeconds; i++) {
-            if (condition.get()) {
+            if (!condition.get()) {
                 sleep(500);
                 return;
             }
