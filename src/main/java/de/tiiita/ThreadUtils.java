@@ -59,7 +59,7 @@ public class ThreadUtils {
      * This is a method which blocks the current thread until the condition is true. There is a time limit,
      * so it does not block infinitely if the condition is never true.
      * <p>
-     * It uses 500-millisecond sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
+     * It uses 1-second sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
      *
      * @param condition  the condition for stopping the thread sleep.
      * @param maxSeconds the maximum time the thread can sleep. If this duration exceeds, this method returns if
@@ -67,10 +67,11 @@ public class ThreadUtils {
      */
     public static void sleepUntil(Supplier<Boolean> condition, int maxSeconds) {
         for (int i = 0; i < maxSeconds; i++) {
-            if (!condition.get()) {
-                sleep(500);
+            if (condition.get()) {
                 return;
             }
+
+            sleep(1000);
         }
     }
 
