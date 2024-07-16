@@ -25,7 +25,7 @@ public class DateTimeUtils {
         long days = period.getDays();
         long hours = duration.toHours();
         long minutes = duration.toMinutes() % 60;
-        long seconds = duration.getSeconds();
+        long seconds = duration.getSeconds() % 60;
 
         StringBuilder formattedDuration = new StringBuilder();
         if (years != 0) {
