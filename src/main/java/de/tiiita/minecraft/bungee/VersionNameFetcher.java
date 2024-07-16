@@ -2,7 +2,7 @@ package de.tiiita.minecraft.bungee;
 
 
 import de.tiiita.StringUtils;
-import de.tiiita.ThreadChecker;
+import de.tiiita.ThreadUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -19,7 +19,7 @@ public class VersionNameFetcher {
      * @return the found version name or null if nothing was found
      */
     public static String getVersionName(int protocolId) {
-        ThreadChecker.asyncOnly();
+        ThreadUtils.asyncOnly();
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(URL).openConnection();
             connection.setRequestMethod("GET");

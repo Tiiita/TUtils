@@ -1,9 +1,11 @@
 package de.tiiita;
 
+import java.util.function.Supplier;
+
 /**
- * Simple class that automatically reports when a method is called in the wrong thread.
+ * Simple class that can block thread with a condition or warn if a method is called in a thread it should not be.
  */
-public class ThreadChecker {
+public class ThreadUtils {
     private static String DEFAULT_MAIN_THREAD = "main";
 
     /**
@@ -50,5 +52,27 @@ public class ThreadChecker {
      */
     public static void setMainThread(String mainThread) {
         DEFAULT_MAIN_THREAD = mainThread;
+    }
+
+    /**
+     * This is a method which blocks the current thread until the condition is true. There is a time limit,
+     * so it does not block infinitely if the condition is never true.
+     * <p>
+     * It uses 500-millisecond sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
+     * @param condition the condition for stopping the thread sleep.
+     * @param maxSeconds the maximum time the thread can sleep. If this duration exceeds, this method returns if
+     *                   the condition was not true until.
+     */
+    public static void sleepUntil(Supplier<Boolean> condition, int maxSeconds) {
+        try {
+            for (int i = 0; i < maxSeconds; i++) {
+                if (condition.get()) {
+                    Thread.sleep(500);
+                    return;
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
