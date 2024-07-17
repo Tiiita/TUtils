@@ -22,6 +22,10 @@ public class FileDownloader {
         this.file = new File(filePath);
     }
 
+    public FileDownloader(File file) {
+        this.file = file;
+    }
+
     /**
      * Using this method you can make an easy get http request to download a file from
      * an url. It also allows you to log the progress with a custom log logic.
@@ -53,7 +57,7 @@ public class FileDownloader {
 
     public File getDownloadedFileUnzipped() {
         try (ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file))) {
-           Files.write(file.toPath(), inputStream.readAllBytes());
+            Files.write(file.toPath(), inputStream.readAllBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
