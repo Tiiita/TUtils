@@ -5,9 +5,9 @@ public class ProgressBar {
         validateProgress(progress);
         StringBuilder barBuilder = new StringBuilder();
 
+        barBuilder.append("(").append(progress).append("%) ");
         barBuilder.append("|".repeat(Math.max(0, progress)));
 
-        barBuilder.append(" (").append(progress).append("%)");
         return barBuilder.toString();
     }
 
