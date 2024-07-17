@@ -39,7 +39,7 @@ public abstract class Logger {
      * @see #getLogMessage(String, String, String)
      */
     public static void logInfo(String message) {
-        getLogMessage(message, ANSI_RESET, "inf");
+        System.out.println(getLogMessage(message, ANSI_RESET, "inf"));
     }
 
     /**
