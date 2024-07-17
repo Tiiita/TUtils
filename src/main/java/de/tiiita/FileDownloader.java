@@ -65,16 +65,6 @@ public class FileDownloader {
         return file;
     }
 
-    public String getProgressBar(int progress) {
-        StringBuilder barBuilder = new StringBuilder();
-
-        for (int i = 0; i < progress; i++) {
-            barBuilder.append("|");
-        }
-
-        return barBuilder.toString();
-    }
-
     private void handleResponse(CloseableHttpResponse response, Consumer<Integer> progressLogger) throws
             IOException {
         HttpEntity entity = response.getEntity();
