@@ -9,14 +9,18 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.zip.ZipInputStream;
 
 public class FileDownloader {
-    private File file;
+    private final File file;
+
+    public FileDownloader(String filePath) {
+        this.file = new File(filePath);
+    }
 
     /**
      * Using this method you can make an easy get http request to download a file from
@@ -38,15 +42,24 @@ public class FileDownloader {
 
     /**
      * Get the downloaded file
+     *
      * @return the file or null of {@link #download(String, Consumer)} was not called or did not complete the
      * download successful.
      */
-
-    @Nullable
     public File getDownloadedFile() {
         return file;
     }
 
+
+    public File getDownloadedFileUnzipped() {
+        try (ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file))) {
+           Files.write(file.toPath(), inputStream.readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return file;
+    }
 
     public String getProgressBar(int progress) {
         StringBuilder barBuilder = new StringBuilder();
@@ -58,7 +71,8 @@ public class FileDownloader {
         return barBuilder.toString();
     }
 
-    private void handleResponse(CloseableHttpResponse response, Consumer<Integer> progressLogger) throws IOException {
+    private void handleResponse(CloseableHttpResponse response, Consumer<Integer> progressLogger) throws
+            IOException {
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             long contentLength = entity.getContentLength();
@@ -72,7 +86,8 @@ public class FileDownloader {
         }
     }
 
-    private void readContent(InputStream inputStream, FileOutputStream outputStream, long contentLength, Consumer<Integer> progressLogger) throws IOException {
+    private void readContent(InputStream inputStream, FileOutputStream outputStream, long contentLength, Consumer<
+            Integer> progressLogger) throws IOException {
         byte[] buffer = new byte[4096];
         int bytesRead;
         long totalBytesRead = 0;
