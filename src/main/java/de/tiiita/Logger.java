@@ -128,4 +128,17 @@ public abstract class Logger {
     public static void enableColors() {
         colors = true;
     }
+
+    public static String getAnsiYellow() {
+        return ANSI_YELLOW;
+    }
+    public static String getAnsiBlue() {
+        return ANSI_BLUE;
+    }
+    public static String getAnsiRed() {
+        return ANSI_RED;
+    }
+    public static String getAnsiResetWhite() {
+        return ANSI_RESET;
+    }
 }
