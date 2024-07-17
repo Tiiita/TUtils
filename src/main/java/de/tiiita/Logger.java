@@ -36,10 +36,10 @@ public abstract class Logger {
      *                <p>
      *                If the colors are enabled, which they are by default, this prints the message in white.
      *                The log file entry will have no color.
-     * @see #log(String, String, String)
+     * @see #getLogMessage(String, String, String)
      */
     public static void logInfo(String message) {
-        log(message, ANSI_RESET, "inf");
+        getLogMessage(message, ANSI_RESET, "inf");
     }
 
     /**
@@ -50,10 +50,10 @@ public abstract class Logger {
      * The log file entry will have no color.
      *
      * @param message the message you want to log.
-     * @see #log(String, String, String)
+     * @see #getLogMessage(String, String, String)
      */
     public static void logWarning(String message) {
-        log(message, ANSI_YELLOW, "war");
+        System.out.println(getLogMessage(message, ANSI_YELLOW, "war"));
 
     }
 
@@ -66,10 +66,10 @@ public abstract class Logger {
      * The log file entry will have no color.
      *
      * @param message the message you want to log.
-     * @see #log(String, String, String)
+     * @see #getLogMessage(String, String, String)
      */
     public static void logError(String message) {
-        log(message, ANSI_RED, "err");
+        System.out.println(getLogMessage(message, ANSI_RED, "err"));
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class Logger {
      * @param message the message you want to log.
      */
     public static void logDebug(String message) {
-        log(message, ANSI_BLUE, "deb");
+        System.out.println(getLogMessage(message, ANSI_BLUE, "deb"));
     }
 
     /**
@@ -92,13 +92,11 @@ public abstract class Logger {
         System.out.println(" ");
     }
 
-    private static void log(String message, String ansiColor, String prefix) {
+    public static String getLogMessage(String message, String ansiColor, String prefix) {
         String nonColorLog = getPrefix(prefix) + " " + message;
-        if (colors) {
-            System.out.println(ansiColor + getPrefix(prefix) + " " + message + ANSI_RESET);
-        } else System.out.println(nonColorLog);
-
         writeToLog(nonColorLog + "\n");
+        return colors ? ansiColor + getPrefix(prefix) + " " + message + ANSI_RESET : nonColorLog;
+
     }
 
 
