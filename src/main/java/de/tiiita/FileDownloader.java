@@ -11,26 +11,27 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class FileDownloader {
     private final File file;
 
-    public FileDownloader(String filePath) {
-        this.file = new File(filePath);
+    public FileDownloader() {
+        try {
+            this.file = Files.createTempFile("temp-filedownloader", "").toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public FileDownloader(File file) {
-        this.file = file;
-    }
 
     /**
      * Using this method you can make an easy get http request to download a file from
-     * an url. It also allows you to log the progress with a custom log logic.
+     * a URL. It also allows you to log the progress with a custom log logic.
      *
-     * @param url            the url to the file that will be downloaded.
+     * @param url            the URL to the file that will be downloaded.
      * @param progressLogger the log logic if logProgress is enabled. Give null if you do not want logging
      */
     public void download(@NotNull String url, @Nullable Consumer<Integer> progressLogger) {
@@ -43,30 +44,63 @@ public class FileDownloader {
         }
     }
 
-
     /**
      * Get the downloaded file
      *
-     * @return the file or null of {@link #download(String, Consumer)} was not called or did not complete the
-     * download successful.
+     * @return the file which contains the downloaded data or an empty file if {@link #download(String, Consumer)} was not called or did not complete the
+     * download successfully.
      */
-    public File getDownloadedFile() {
+    public File get() {
         return file;
     }
 
+    /**
+     * Unzips the downloaded file into a folder named "extracted" in the same directory.
+     *
+     * @return the path to the extracted folder
+     */
+    public File getAsUnzippedDir(String extractDirPath) {
+        File extractFolder = new File(extractDirPath);
+        if (!extractFolder.exists() && !extractFolder.mkdirs())
+            throw new RuntimeException("Failed to create directories: " + extractFolder.getAbsolutePath());
 
-    public File getDownloadedFileUnzipped() {
-        try (ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file))) {
-            Files.write(file.toPath(), inputStream.readAllBytes());
+
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
+                File newFile = new File(extractFolder, zipEntry.getName());
+
+                if (zipEntry.isDirectory()) {
+                    if (!newFile.mkdirs()) {
+                        throw new RuntimeException("Failed to create directory: " + newFile.getAbsolutePath());
+                    }
+                } else {
+                    File parentDir = newFile.getParentFile();
+                    if (parentDir != null && !parentDir.exists()) {
+                        if (!parentDir.mkdirs()) {
+                            throw new RuntimeException("Failed to create directory: " + parentDir.getAbsolutePath());
+                        }
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = zis.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
+                    }
+                }
+                zis.closeEntry();
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to unzip file", e);
         }
 
-        return file;
+        return extractFolder;
     }
 
-    private void handleResponse(CloseableHttpResponse response, Consumer<Integer> progressLogger) throws
-            IOException {
+
+    private void handleResponse(CloseableHttpResponse response, Consumer<Integer> progressLogger) throws IOException {
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             long contentLength = entity.getContentLength();
@@ -80,8 +114,7 @@ public class FileDownloader {
         }
     }
 
-    private void readContent(InputStream inputStream, FileOutputStream outputStream, long contentLength, Consumer<
-            Integer> progressLogger) throws IOException {
+    private void readContent(InputStream inputStream, FileOutputStream outputStream, long contentLength, Consumer<Integer> progressLogger) throws IOException {
         byte[] buffer = new byte[4096];
         int bytesRead;
         long totalBytesRead = 0;
@@ -90,10 +123,12 @@ public class FileDownloader {
         while ((bytesRead = inputStream.read(buffer)) != -1) {
             outputStream.write(buffer, 0, bytesRead);
             totalBytesRead += bytesRead;
-            int newPercentCompleted = (int) (totalBytesRead * 100 / contentLength);
-            if (progressLogger != null && newPercentCompleted > percentCompleted) {
-                percentCompleted = newPercentCompleted;
-                progressLogger.accept(percentCompleted);
+            if (contentLength > 0) {
+                int newPercentCompleted = (int) (totalBytesRead * 100 / contentLength);
+                if (progressLogger != null && newPercentCompleted > percentCompleted) {
+                    percentCompleted = newPercentCompleted;
+                    progressLogger.accept(percentCompleted);
+                }
             }
         }
     }
