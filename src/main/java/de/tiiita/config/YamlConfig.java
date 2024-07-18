@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -198,16 +199,29 @@ public class YamlConfig {
     }
 
 
-    private void loadYaml(InputStream inputStream, Map<String, Object> target) throws IOException {
+    public void loadYaml(InputStream inputStream, Map<String, Object> target) throws IOException {
         Yaml yaml = new Yaml();
         try (Reader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             Map<String, Object> yamlConfig = yaml.load(reader);
             if (yamlConfig == null) {
                 throw new IllegalArgumentException("Invalid YAML syntax");
             }
-            target.putAll(yamlConfig);
+            flattenYaml("", yamlConfig, target);
         }
     }
+
+    private void flattenYaml(String prefix, Object value, Map<String, Object> target) {
+        if (value instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                flattenYaml(prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey(), entry.getValue(), target);
+            }
+        } else {
+            target.put(prefix, value);
+        }
+    }
+
 
     void load(String fileName) throws IOException {
         File configFile = new File(fileName);
@@ -264,9 +278,30 @@ public class YamlConfig {
         Files.writeString(path, sb.toString());
     }
 
-    private void saveYaml(Path path) throws IOException {
+    public void saveYaml(Path path) throws IOException {
         Yaml yaml = new Yaml();
-        String yamlString = yaml.dump(config);
+        Map<String, Object> nestedConfig = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : config.entrySet()) {
+            putNestedValue(nestedConfig, entry.getKey(), entry.getValue());
+        }
+
+        String yamlString = yaml.dump(nestedConfig);
         Files.writeString(path, yamlString);
     }
+
+
+
+
+    private void putNestedValue(Map<String, Object> map, String key, Object value) {
+        String[] keys = key.split("\\.");
+        Map<String, Object> currentMap = map;
+        for (int i = 0; i < keys.length - 1; i++) {
+            currentMap = (Map<String, Object>) currentMap.computeIfAbsent(keys[i], k -> new LinkedHashMap<>());
+        }
+        // Put the value in the last map entry
+        currentMap.put(keys[keys.length - 1], value);
+    }
+
+
 }
