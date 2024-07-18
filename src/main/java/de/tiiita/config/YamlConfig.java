@@ -197,40 +197,30 @@ public class YamlConfig {
 
     }
 
-    private void loadYaml(InputStream inputStream, Map<String, Object> target, String pathPrefix) throws IOException {
+
+    private void loadYaml(InputStream inputStream, Map<String, Object> target) throws IOException {
         Yaml yaml = new Yaml();
         try (Reader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             Map<String, Object> yamlConfig = yaml.load(reader);
             if (yamlConfig == null) {
                 throw new IllegalArgumentException("Invalid YAML syntax");
             }
-            for (Map.Entry<String, Object> entry : yamlConfig.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                String s = pathPrefix.isEmpty() ? key : pathPrefix + "." + key;
-                if (value instanceof Map) {
-                    loadYaml(new ByteArrayInputStream(yaml.dump(value).getBytes()), target, s);
-                } else {
-                    target.put(s, value);
-                }
-            }
+            target.putAll(yamlConfig);
         }
     }
 
     void load(String fileName) throws IOException {
         File configFile = new File(fileName);
         if (configFile.exists()) {
-            // If the config file exists, load it from the file
             try (InputStream inputStream = Files.newInputStream(configFile.toPath())) {
                 String fileExtension = getFileExtension(fileName);
                 if (fileExtension.equals("yml") || fileExtension.equals("yaml")) {
-                    loadYaml(inputStream, config, "");
+                    loadYaml(inputStream, config);
                 } else {
                     loadPlainText(inputStream);
                 }
             }
         } else {
-            // If the config file doesn't exist, load it from the jar
             ClassLoader classLoader = getClass().getClassLoader();
             try (InputStream inputStream = classLoader.getResourceAsStream(fileName)) {
                 if (inputStream == null) {
@@ -238,14 +228,13 @@ public class YamlConfig {
                 }
                 String fileExtension = getFileExtension(fileName);
                 if (fileExtension.equals("yml") || fileExtension.equals("yaml")) {
-                    loadYaml(inputStream, config, "");
+                    loadYaml(inputStream, config);
                 } else {
                     loadPlainText(inputStream);
                 }
             }
         }
     }
-
 
     private String getFileExtension(String filePath) {
         String fileName = new File(filePath).getName();
@@ -258,7 +247,9 @@ public class YamlConfig {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
-                config.put(parts[0].trim(), parts[1].trim());
+                if (parts.length == 2) {
+                    config.put(parts[0].trim(), parts[1].trim());
+                }
             }
         }
     }
