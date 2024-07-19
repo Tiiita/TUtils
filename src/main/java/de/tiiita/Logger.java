@@ -1,11 +1,10 @@
 package de.tiiita;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -18,15 +17,10 @@ public abstract class Logger {
     private static final String ANSI_RED = "\u001B[38;2;226;77;71m";
     private static final String ANSI_BLUE = "\u001B[38;2;42;125;211m";
     private static final String ANSI_RESET = "\u001B[0m";
-    private static final File logFile;
+    private static final ByteArrayOutputStream log;
 
     static {
-        try {
-            logFile = Files.createTempFile(DateTimeUtils.getCurrentTimeFormatted("MM/dd/yy_HH-mm-ss"), ".log").toFile();
-            logFile.deleteOnExit();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        log = new ByteArrayOutputStream();
     }
 
     /**
@@ -36,10 +30,10 @@ public abstract class Logger {
      *                <p>
      *                If the colors are enabled, which they are by default, this prints the message in white.
      *                The log file entry will have no color.
-     * @see #getLogMessage(String, String, String)
+     * @see #getLogMessage(String, String, String, boolean)
      */
     public static void logInfo(String message) {
-        System.out.println(getLogMessage(message, ANSI_RESET, "inf"));
+        System.out.println(getLogMessage(message, ANSI_RESET, "inf", true));
     }
 
     /**
@@ -50,10 +44,10 @@ public abstract class Logger {
      * The log file entry will have no color.
      *
      * @param message the message you want to log.
-     * @see #getLogMessage(String, String, String)
+     * @see #getLogMessage(String, String, String, boolean)
      */
     public static void logWarning(String message) {
-        System.out.println(getLogMessage(message, ANSI_YELLOW, "war"));
+        System.out.println(getLogMessage(message, ANSI_YELLOW, "war", true));
 
     }
 
@@ -66,10 +60,10 @@ public abstract class Logger {
      * The log file entry will have no color.
      *
      * @param message the message you want to log.
-     * @see #getLogMessage(String, String, String)
+     * @see #getLogMessage(String, String, String, boolean)
      */
     public static void logError(String message) {
-        System.out.println(getLogMessage(message, ANSI_RED, "err"));
+        System.out.println(getLogMessage(message, ANSI_RED, "err", true));
     }
 
     /**
@@ -81,7 +75,7 @@ public abstract class Logger {
      * @param message the message you want to log.
      */
     public static void logDebug(String message) {
-        System.out.println(getLogMessage(message, ANSI_BLUE, "deb"));
+        System.out.println(getLogMessage(message, ANSI_BLUE, "deb", true));
     }
 
     /**
@@ -92,26 +86,40 @@ public abstract class Logger {
         System.out.println(" ");
     }
 
-    public static String getLogMessage(String message, String ansiColor, String prefix) {
+    public static String getLogMessage(String message, String ansiColor, String prefix, boolean writeToLogStream) {
         String nonColorLog = getPrefix(prefix) + " " + message;
-        writeToLog(nonColorLog + "\n");
+        if (writeToLogStream) writeToLog(nonColorLog + "\n");
         return colors ? ansiColor + getPrefix(prefix) + " " + message + ANSI_RESET : nonColorLog;
 
     }
 
 
     private static void writeToLog(String string) {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(logFile)) {
-            fileOutputStream.write(string.getBytes());
+        try {
+            log.write(string.getBytes());
+            log.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    public static File getLogFile() {
-        return logFile;
+    public static OutputStream getLog() {
+        return log;
     }
+
+    public static File getLogAsFile(String path) {
+        File file = new File(path);
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(log.toByteArray());
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return file;
+    }
+
 
     //Example: [22:01:59] [INFO]:
     private static String getPrefix(String logType) {
@@ -132,12 +140,15 @@ public abstract class Logger {
     public static String getAnsiYellow() {
         return ANSI_YELLOW;
     }
+
     public static String getAnsiBlue() {
         return ANSI_BLUE;
     }
+
     public static String getAnsiRed() {
         return ANSI_RED;
     }
+
     public static String getAnsiResetWhite() {
         return ANSI_RESET;
     }
