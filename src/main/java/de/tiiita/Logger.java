@@ -22,7 +22,7 @@ public abstract class Logger {
 
     static {
         try {
-            logFile = Files.createTempFile("logs", ".log").toFile();
+            logFile = Files.createTempFile(DateTimeUtils.getCurrentTimeFormatted("MM/dd/yy HH:mm"), ".log").toFile();
             logFile.deleteOnExit();
         } catch (IOException e) {
             throw new RuntimeException(e);
