@@ -1,6 +1,9 @@
 package de.tiiita;
 
 import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Deprecated
 public class Countdown {
@@ -10,7 +13,6 @@ public class Countdown {
     private Runnable eachCycle;
 
     private boolean running;
-    private Thread countdownThread;
 
     //Doesnt work currently
     public Countdown(Duration duration) {
@@ -26,26 +28,22 @@ public class Countdown {
     public synchronized void start() {
         if (running)
             throw new IllegalStateException("Cannot start time because it is already running.");
-        countdownThread = new Thread(() -> {
-            while (counter > 0) {
-                counter--;
-                try {
-                    Thread.sleep(getIntervalMillis(duration));
-                } catch (InterruptedException ignore) {
-                } //This is caused by pause, no problem
-
-                if (eachCycle != null) {
-                    eachCycle.run();
-                }
+        while (counter > 0) {
+            counter--;
+            if (eachCycle == null) {
+                eachCycle = () -> {
+                };
             }
 
-            if (whenComplete != null) {
-                whenComplete.run();
-            }
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            scheduledExecutorService
+                    .scheduleAtFixedRate(eachCycle, 0, getIntervalMillis(duration), TimeUnit.MILLISECONDS);
 
-        });
+        }
 
-        countdownThread.start();
+        if (whenComplete != null) {
+            whenComplete.run();
+        }
     }
 
 
@@ -74,7 +72,6 @@ public class Countdown {
      */
     public synchronized void pause() {
         if (running) return;
-        countdownThread.interrupt();
         running = false;
     }
 
@@ -95,7 +92,6 @@ public class Countdown {
     public synchronized long getCounter() {
         return counter;
     }
-
 
     public synchronized void reset() {
         counter = duration.toMillis();

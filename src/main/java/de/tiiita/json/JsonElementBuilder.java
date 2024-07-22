@@ -3,6 +3,7 @@ package de.tiiita.json;
 /**
  * An JsonElementBuilder is a builder which can build a specific json element.
  */
+@FunctionalInterface
 public interface JsonElementBuilder {
 
     /**

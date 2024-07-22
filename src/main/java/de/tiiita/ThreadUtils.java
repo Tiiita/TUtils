@@ -62,16 +62,16 @@ public class ThreadUtils {
      * It uses 1-second sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
      *
      * @param condition  the condition for stopping the thread sleep.
-     * @param maxSeconds the maximum time the thread can sleep. If this duration exceeds, this method returns if
+     * @param maxMillis the maximum time the thread can sleep. If this duration exceeds, this method returns if
      *                   the condition was not true until.
      */
-    public static void sleepUntil(Supplier<Boolean> condition, int maxSeconds) {
-        for (int i = 0; i < maxSeconds; i++) {
+    public static void sleepUntil(Supplier<Boolean> condition, int maxMillis) {
+        for (int i = 0; i < maxMillis; i++) {
             if (condition.get()) {
                 return;
             }
 
-            sleep(1000);
+            sleep(1);
         }
     }
 
