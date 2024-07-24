@@ -55,23 +55,35 @@ public class ThreadUtils {
         DEFAULT_MAIN_THREAD = mainThread;
     }
 
+
+    /**
+     * This method is an overwritten method for precise sleeping with condition.
+     * The main logic is in: {@link #sleepUntil(Supplier, int, int)}
+     */
+    public static void sleepUntil(Supplier<Boolean> condition, int maxMillis) {
+       sleepUntil(condition, maxMillis, 1);
+    }
+
     /**
      * This is a method which blocks the current thread until the condition is true. There is a time limit,
      * so it does not block infinitely if the condition is never true.
      * <p>
-     * It uses 1-second sleep intervals, so it can be a little delay between the met condition and the thread wakeup.
+     * It uses a 1-millisecond sleep intervals, so it can sleep very precisely.
      *
      * @param condition  the condition for stopping the thread sleep.
      * @param maxMillis the maximum time the thread can sleep. If this duration exceeds, this method returns if
      *                   the condition was not true until.
+     * @param intervalMillis this is the interval the thread sleeps. So if this is set to 500
+     *                       and the condition is met after 200ms it would still sleep 300 ms.
+     * @see #sleepUntil(Supplier, int)
      */
-    public static void sleepUntil(Supplier<Boolean> condition, int maxMillis) {
+    public static void sleepUntil(Supplier<Boolean> condition, int maxMillis, int intervalMillis) {
         for (int i = 0; i < maxMillis; i++) {
             if (condition.get()) {
                 return;
             }
 
-            sleep(1);
+            sleep(intervalMillis);
         }
     }
 

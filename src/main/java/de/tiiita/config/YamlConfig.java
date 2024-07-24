@@ -29,7 +29,7 @@ public class YamlConfig {
      * @param fileName the file name. Example: config.yml
      * @param identifier the identifier. A good method to use is to use ids like 1, 2 or 3.
      */
-    public YamlConfig(@NotNull String fileName, int identifier) {
+    public YamlConfig(@NotNull String fileName, String identifier) {
         this.filePath = fileName;
         config = new HashMap<>();
         try {
@@ -148,19 +148,19 @@ public class YamlConfig {
         config.remove(path);
     }
 
-    void addConfigId(int id) {
+    void addConfigId(String id) {
         removeEntry(CONFIG_ID);
-        setInt(CONFIG_ID, id);
+        setString(CONFIG_ID, id);
     }
 
     /**
      * Every config has a config id. That is an identifier.
-     * To check if a config is the right one in the code, use the ConfigHelper class.
+     * To check if a config is the right one in the code
      *
-     * @return the config id.
+     * @return the config string id.
      */
-    public int getConfigId() {
-        return getInt(CONFIG_ID);
+    public String getConfigId() {
+        return getString(CONFIG_ID);
     }
 
 
@@ -191,11 +191,10 @@ public class YamlConfig {
      * @param identifier the identifier for the config you expect this to be.
      * @throws WrongConfigException if the config ids don't match.
      */
-    public void checkRightConfig(int identifier) {
-        if (getConfigId() != identifier)
+    public void checkRightConfig(String identifier) {
+        if (getConfigId().equalsIgnoreCase(identifier))
             throw new WrongConfigException("Wrong config, config-id: " + getConfigId()
                     + ", wanted config-id: " + identifier);
-
     }
 
 
