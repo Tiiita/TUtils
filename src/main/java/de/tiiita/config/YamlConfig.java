@@ -192,9 +192,9 @@ public class YamlConfig {
      * @throws WrongConfigException if the config ids don't match.
      */
     public void checkRightConfig(String identifier) {
-        if (getConfigId().equalsIgnoreCase(identifier))
+        if (!getConfigId().equalsIgnoreCase(identifier))
             throw new WrongConfigException("Wrong config, config-id: " + getConfigId()
-                    + ", wanted config-id: " + identifier);
+                    + ", expected config-id: " + identifier);
     }
 
 
