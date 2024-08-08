@@ -13,20 +13,11 @@ public class StringUtils {
      * @return the converted String.
      */
     public static String asString(InputStream stream) {
-        BufferedReader input = new BufferedReader(new InputStreamReader(stream));
-        String inputLine;
-        StringBuilder string = new StringBuilder();
-
-        while (true) {
-            try {
-                if ((inputLine = input.readLine()) == null) break;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            string.append(inputLine);
+        try {
+            return new String(stream.readAllBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return string.toString();
     }
 
     public static int getStringSimilarity(String a, String b) {
@@ -44,6 +35,7 @@ public class StringUtils {
         if (lenA == 0 || lenB == 0) {
             return 0;
         }
+
 
         int[][] dp = new int[lenA + 1][lenB + 1];
 

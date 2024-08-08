@@ -120,12 +120,11 @@ public class DateTimeUtils {
         }
 
         // Combine all units into a single Duration
-        Duration totalDuration = Duration.ofDays(totalDays)
+
+      return Duration.ofDays(totalDays)
                 .plusHours(totalHours)
                 .plusMinutes(totalMinutes)
                 .plusSeconds(totalSeconds);
-
-        return totalDuration;
     }
 
 }
