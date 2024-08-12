@@ -127,4 +127,9 @@ public abstract class Logger {
   public static String getAnsiResetWhite() {
     return ANSI_RESET;
   }
+
+  public static String getAnsiGreen() {
+    return ANSI_GREEN;
+  }
+
 }
