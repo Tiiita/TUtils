@@ -3,10 +3,10 @@ package de.tiiita;
 public class ProgressBar {
 
   private final int progressBarWidth;
-  private final char emptyIcon;
-  private final char progressIcon;
+  private final String emptyIcon;
+  private final String progressIcon;
 
-  public ProgressBar(int progressBarWidth, char emptyIcon, char progressIcon) {
+  public ProgressBar(int progressBarWidth, String emptyIcon, String progressIcon) {
     this.progressBarWidth = progressBarWidth;
     this.emptyIcon = emptyIcon;
     this.progressIcon = progressIcon;
