@@ -5,15 +5,16 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * This is a custom logger which supports colored and uncolored output. It allows you to get the
  * full log as a file.
  */
 public abstract class Logger {
-
-  private static boolean colors = true;
   private static final String ANSI_YELLOW = "\u001B[38;2;166;138;13m";
   private static final String ANSI_RED = "\u001B[38;2;226;77;71m";
   private static final String ANSI_BLUE = "\u001B[38;2;42;125;211m";
@@ -87,7 +88,6 @@ public abstract class Logger {
   }
 
 
-
   public static File getLogAsFile(String path) {
     File file = new File(path);
     try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -101,12 +101,12 @@ public abstract class Logger {
   }
 
   private static String getPrefix(String logType, String color) {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss.SSS");
-    String time = simpleDateFormat.format(Date.from(Instant.now()));
-    String timeFormatted =  time + " ";
+    LocalDateTime now = LocalDateTime.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    String formattedDate = now.format(formatter) + " ";
 
-    return color == null ? timeFormatted + logType.toUpperCase() + ":"
-        : timeFormatted  + color + logType.toUpperCase() + getAnsiResetWhite() + ":";
+    return color == null ? formattedDate + logType.toUpperCase() + ":"
+        : formattedDate + color + logType.toUpperCase() + getAnsiResetWhite() + ":";
   }
 
 

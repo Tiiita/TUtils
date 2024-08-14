@@ -14,8 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class FileDownloader {
 
@@ -63,14 +61,15 @@ public class FileDownloader {
   }
 
   /**
-   * Unzips the downloaded file into a folder named "extracted" in the same directory.
+   * Unzips the downloaded file(s) into a folder with the name given.
    *
+   * @param extractionDirectoryPath the path to the folder to extract to.
    * @return the path to the extracted folder
    */
-  public File getAsUnzippedDir(String extractDirPath) {
+  public File getUnzipped(String extractionDirectoryPath) {
     try (ZipFile zipFile = new ZipFile(file)) {
-      zipFile.extractAll(extractDirPath);
-      return new File(extractDirPath);
+      zipFile.extractAll(extractionDirectoryPath);
+      return new File(extractionDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
