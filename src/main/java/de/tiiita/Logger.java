@@ -100,8 +100,6 @@ public abstract class Logger {
     return file;
   }
 
-
-  //Example: [22:01:59] [INFO]:
   private static String getPrefix(String logType, String color) {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss.SSS");
     String time = simpleDateFormat.format(Date.from(Instant.now()));
