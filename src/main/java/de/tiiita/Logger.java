@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
@@ -88,24 +89,14 @@ public abstract class Logger {
   }
 
 
-  public static File getLogAsFile(String path) {
-    File file = new File(path);
-    try (FileOutputStream outputStream = new FileOutputStream(file)) {
-      outputStream.write(System.in.readAllBytes());
-      outputStream.flush();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    return file;
-  }
-
   private static String getPrefix(String logType, String color) {
     LocalDateTime now = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     String formattedDate = now.format(formatter) + " ";
 
-    return color == null ? formattedDate + logType.toUpperCase() + ":"
+    String uncoloredLog = formattedDate + logType.toUpperCase() + ":";
+
+    return color == null ? uncoloredLog
         : formattedDate + color + logType.toUpperCase() + getAnsiResetWhite() + ":";
   }
 
@@ -129,5 +120,4 @@ public abstract class Logger {
   public static String getAnsiGreen() {
     return ANSI_GREEN;
   }
-
 }
