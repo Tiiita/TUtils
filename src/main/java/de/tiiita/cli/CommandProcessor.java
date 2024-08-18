@@ -48,8 +48,7 @@ class CommandProcessor {
       try {
         ArgumentModel argByName = getArgByName(argumentAnnotation.name(), args);
         if (!argumentAnnotation.optional() && argByName == null) {
-          throw new NoArgumentFoundException(
-              "Command needs argument: " + argumentAnnotation.name());
+          System.out.println(CommandService.getUsage(command));
         }
 
         if (argByName != null && argByName.getValue() != null) {

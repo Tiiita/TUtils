@@ -17,6 +17,7 @@ public class CommandService {
   private static final List<Callable<?>> commands = new ArrayList<>();
   private static final CommandParser parser;
   private static final CommandProcessor processor;
+  private static String noCommandFoundMessage = "No command found, type 'help'";
 
   static {
     parser = new CommandParser();
@@ -53,7 +54,7 @@ public class CommandService {
    * @param command the command instance.
    * @return the usage of the command
    */
-  public static <T extends Callable<?>> String getUsage(T command) {
+  public static String getUsage(Object command) {
     StringBuilder usageBuilder = new StringBuilder();
     Argument[] arguments = command.getClass().getAnnotationsByType(Argument.class);
 
@@ -67,6 +68,7 @@ public class CommandService {
 
     return usageBuilder.toString();
   }
+
 
   static List<Callable<?>> getCommands() {
     return new ArrayList<>(commands);
