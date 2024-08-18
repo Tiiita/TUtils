@@ -28,5 +28,4 @@ public @interface Command {
    * @return the set description or a default one.
    */
   String description() default "No description set..";
-
 }

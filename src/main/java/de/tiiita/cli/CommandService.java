@@ -1,6 +1,7 @@
 package de.tiiita.cli;
 
-import java.lang.reflect.Field;
+import de.tiiita.cli.ArgumentModel;
+import de.tiiita.cli.CommandProcessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CommandService {
 
-  private static final List<Callable<?>> commands = new ArrayList<>();
+  private static final List<CliCommand> commands = new ArrayList<>();
   private static final CommandParser parser;
   private static final CommandProcessor processor;
 
@@ -38,12 +39,12 @@ public class CommandService {
       return;
     }
 
-    Map<Callable<?>, List<ArgumentModel>> parsedInput = parser.parse(input);
+    Map<CliCommand, List<ArgumentModel>> parsedInput = parser.parse(input);
     if (parsedInput == null) {
       return;
     }
 
-    Entry<Callable<?>, List<ArgumentModel>> next = parsedInput.entrySet().iterator().next();
+    Entry<CliCommand, List<ArgumentModel>> next = parsedInput.entrySet().iterator().next();
     processor.process(next.getKey(), next.getValue());
   }
 
@@ -54,7 +55,7 @@ public class CommandService {
    * @param command the command instance. This has implement {@link Callable} and needs to have the
    *                {@link Command} annotation, otherwise an exception is being thrown.
    */
-  public static <T extends Callable<?>> void register(@NotNull T command) {
+  public static void register(@NotNull CliCommand command) {
     commands.add(command);
   }
 
@@ -64,9 +65,16 @@ public class CommandService {
    * @param command the command instance.
    * @return the usage of the command
    */
-  public static String getUsage(Object command) {
+  public static String getUsage(CliCommand command) {
     StringBuilder usageBuilder = new StringBuilder();
     usageBuilder.append(command.getClass().getAnnotation(Command.class).name());
+    String subCommandPart = command.getSubCommands().isEmpty() ? ""
+        : command.getSubCommands()
+            .stream()
+            .map(sub -> sub.getClass().getAnnotation(Command.class).name())
+            .collect(Collectors.toList())
+            .toString();
+
     for (Argument argument : getArgumentsSorted(command)) {
 
       String argumentPart = argument.optional() ? "[" + argument.name() + "]"
@@ -75,8 +83,10 @@ public class CommandService {
       usageBuilder.append(" ").append(argumentPart);
     }
 
+    usageBuilder.append(" ").append(subCommandPart);
     return usageBuilder.toString();
   }
+
 
   private static List<Argument> getArgumentsSorted(Object command) {
     return Arrays.stream(command.getClass().getDeclaredFields())
@@ -86,7 +96,7 @@ public class CommandService {
         .collect(Collectors.toList());
   }
 
-  static List<Callable<?>> getCommands() {
+  public static List<CliCommand> getCommands() {
     return new ArrayList<>(commands);
   }
 }

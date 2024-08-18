@@ -1,10 +1,7 @@
 package de.tiiita.cli;
 
-import de.tiiita.cli.exception.MissingAnnotationException;
-import de.tiiita.Logger;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
 class CommandProcessor {
@@ -12,34 +9,49 @@ class CommandProcessor {
   /**
    * Injects the parsed arguments into the command instance {@link #injectArguments(Object, List)}.
    * It then calls the super method of callable which executes the command implementation.
+   *
    * @param command the command instance
-   * @param args the parsed command arguments.
+   * @param args    the parsed command arguments.
    */
-  void process(Object command, List<ArgumentModel> args) {
+  protected void process(CliCommand command, List<ArgumentModel> args) {
     if (!injectArguments(command, args)) {
       return;
     }
     try {
-      ((Callable<?>) command).call();
+      CliCommand cliCommand = (CliCommand) command;
+
+      for (CliCommand subCommand : cliCommand.getSubCommands()) {
+        for (ArgumentModel arg : args) {
+          Command commandAnnotation = subCommand.getClass().getAnnotation(Command.class);
+          if (!commandAnnotation.name().equalsIgnoreCase(arg.getName())) {
+            continue;
+          }
+
+          subCommand.execute();
+        }
+      }
+
+      cliCommand.execute();
+
+
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
   /**
-   * This gets the argument models and the command and injects the argument values
-   * into every field in the command instance where the {@link Argument} annotation was found.
-   * If there is no argument found but the argument is required {@link Argument#optional()}
-   * the usage will be print.
-   * If the value of the argument is null it will not inject anything into the declared variable,
-   * which means the default value will stay.
+   * This gets the argument models and the command and injects the argument values into every field
+   * in the command instance where the {@link Argument} annotation was found. If there is no
+   * argument found but the argument is required {@link Argument#optional()} the usage will be
+   * print. If the value of the argument is null it will not inject anything into the declared
+   * variable, which means the default value will stay.
    *
    * @param command the command instance
-   * @param args the arguments models parsed by the parser.
-   * @return true if the operation was successful, false if not. Error handling
-   * is inside this method.
+   * @param args    the arguments models parsed by the parser.
+   * @return true if the operation was successful, false if not. Error handling is inside this
+   * method.
    */
-  private boolean injectArguments(Object command, List<ArgumentModel> args) {
+  private boolean injectArguments(CliCommand command, List<ArgumentModel> args) {
     for (Field declaredField : command.getClass().getDeclaredFields()) {
       if (!declaredField.isAnnotationPresent(Argument.class)) {
         continue;
@@ -69,6 +81,7 @@ class CommandProcessor {
 
   /**
    * This is just a simple method to get an argument by its name.
+   *
    * @param name the name the method should search for.
    * @param args the arguments the method should search in.
    * @return the found argument model or null if no name matched with the given args.

@@ -1,5 +1,8 @@
-package de.tiiita.cli;
+package de.tiiita.cli.command;
 
+import de.tiiita.cli.CliCommand;
+import de.tiiita.cli.Command;
+import de.tiiita.cli.CommandService;
 import java.util.concurrent.Callable;
 
 /**
@@ -9,17 +12,16 @@ import java.util.concurrent.Callable;
  * you have to use the right import for the right help command!
  */
 @Command(name = "help", description = "Show all commands and their description")
-public class HelpCommand implements Callable<Void> {
+public class HelpCommand extends CliCommand {
 
   @Override
-  public Void call() {
+  public void execute() {
     System.out.println("=== HELP ===");
-    for (Callable<?> command : CommandService.getCommands()) {
+    for (CliCommand command : CommandService.getCommands()) {
       Command commandAnnotation = command.getClass().getAnnotation(Command.class);
       String commandHelp = commandAnnotation.name() + " - " + commandAnnotation.description();
       System.out.println(commandHelp);
     }
     System.out.println(" ");
-    return null;
   }
 }

@@ -1,10 +1,11 @@
 package de.tiiita.cli;
 
+import de.tiiita.cli.ArgumentModel;
+import de.tiiita.cli.CommandProcessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -27,9 +28,9 @@ class CommandParser {
    * value is a list of the arguments as models that can be used in code. Null of no command was found.
    */
   @Nullable
-  Map<Callable<?>, List<ArgumentModel>> parse(String input) {
+  Map<CliCommand, List<ArgumentModel>> parse(String input) {
     String[] inputSplit = input.split(" ");
-    for (Callable<?> command : CommandService.getCommands()) {
+    for (CliCommand command : CommandService.getCommands()) {
       processor.validateAnnotations(command);
 
       if (command.getClass().getAnnotation(Command.class).name()
