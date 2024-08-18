@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CliCommand {
+public @interface Command {
   String name();
   String description() default "(Default description) command-name args...";
 }

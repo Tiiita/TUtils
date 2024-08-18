@@ -1,22 +1,13 @@
 package de.tiiita.cli;
 
-public class Argument {
-  private String name;
-  private String value;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getValue() {
-    return value;
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Argument {
+  String name();
+  boolean optional();
 }

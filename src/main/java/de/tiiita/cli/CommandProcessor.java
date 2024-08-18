@@ -4,26 +4,31 @@ import de.tiiita.cli.exception.MissingAnnotationException;
 import de.tiiita.cli.exception.NoArgumentFoundException;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
-public class CliCommandProcessor {
+class CommandProcessor {
 
-  void process(Object command, List<Argument> args) {
+  void process(Object command, List<ArgumentModel> args) {
     injectArguments(command, args);
-    ((CallableCommand) command).execute();
+    try {
+      ((Callable<?>) command).call();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  private void injectArguments(Object command, List<Argument> args) {
+  private void injectArguments(Object command, List<ArgumentModel> args) {
     for (Field declaredField : command.getClass().getDeclaredFields()) {
-      if (!declaredField.isAnnotationPresent(CliArgument.class)) {
+      if (!declaredField.isAnnotationPresent(Argument.class)) {
         continue;
       }
 
-      CliArgument argumentAnnotation = declaredField.getAnnotation(CliArgument.class);
+      Argument argumentAnnotation = declaredField.getAnnotation(Argument.class);
 
       declaredField.setAccessible(true);
       try {
-        Argument argByName = getArgByName(argumentAnnotation.name(), args);
+        ArgumentModel argByName = getArgByName(argumentAnnotation.name(), args);
         if (!argumentAnnotation.optional() && argByName == null) {
           throw new NoArgumentFoundException(
               "Command needs argument: " + argumentAnnotation.name());
@@ -42,8 +47,8 @@ public class CliCommandProcessor {
 
 
   @Nullable
-  private Argument getArgByName(String name, List<Argument> args) {
-    for (Argument arg : args) {
+  private ArgumentModel getArgByName(String name, List<ArgumentModel> args) {
+    for (ArgumentModel arg : args) {
       if (arg.getName().equalsIgnoreCase(name)) {
         return arg;
       }
@@ -53,7 +58,7 @@ public class CliCommandProcessor {
   }
 
   public void validateAnnotations(Object command) {
-    if (!command.getClass().isAnnotationPresent(CliCommand.class)) {
+    if (!command.getClass().isAnnotationPresent(Command.class)) {
       throw new MissingAnnotationException("Command class has to have CliCommand.class annotation");
     }
   }
