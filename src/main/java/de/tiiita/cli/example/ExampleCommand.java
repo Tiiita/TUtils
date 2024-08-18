@@ -1,6 +1,5 @@
 package de.tiiita.cli.example;
 
-
 import de.tiiita.Logger;
 import de.tiiita.cli.Argument;
 import de.tiiita.cli.Command;

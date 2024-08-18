@@ -1,6 +1,5 @@
 package de.tiiita;
 
-import de.tiiita.cli.CommandParser;
 import de.tiiita.cli.CommandService;
 import de.tiiita.cli.example.ExampleCommand;
 

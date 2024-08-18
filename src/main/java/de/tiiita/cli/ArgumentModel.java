@@ -1,5 +1,10 @@
 package de.tiiita.cli;
 
+
+/**
+ * This represents a command argument
+ * so you can get information easier.
+ */
 class ArgumentModel {
   private String name;
   private String value;
