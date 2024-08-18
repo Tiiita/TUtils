@@ -1,25 +1,12 @@
 package de.tiiita;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-/**
- * This is a custom logger which supports colored and uncolored output. It allows you to get the
- * full log as a file.
- */
-public abstract class Logger {
+public class Logger {
   private static final String ANSI_YELLOW = "\u001B[38;2;166;138;13m";
   private static final String ANSI_RED = "\u001B[38;2;226;77;71m";
   private static final String ANSI_BLUE = "\u001B[38;2;42;125;211m";
-  private static final String ANSI_RESET = "\u001B[0m";
   private static final String ANSI_GREEN = "\033[38;5;10m";
 
   /**
@@ -97,27 +84,6 @@ public abstract class Logger {
     String uncoloredLog = formattedDate + logType.toUpperCase() + ":";
 
     return color == null ? uncoloredLog
-        : formattedDate + color + logType.toUpperCase() + getAnsiResetWhite() + ":";
-  }
-
-
-  public static String getAnsiYellow() {
-    return ANSI_YELLOW;
-  }
-
-  public static String getAnsiBlue() {
-    return ANSI_BLUE;
-  }
-
-  public static String getAnsiRed() {
-    return ANSI_RED;
-  }
-
-  public static String getAnsiResetWhite() {
-    return ANSI_RESET;
-  }
-
-  public static String getAnsiGreen() {
-    return ANSI_GREEN;
+        : formattedDate + color + logType.toUpperCase() + "\u001B[0m" + ":";
   }
 }

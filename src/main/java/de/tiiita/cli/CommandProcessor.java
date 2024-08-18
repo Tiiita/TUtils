@@ -1,10 +1,9 @@
 package de.tiiita.cli;
 
 import de.tiiita.cli.exception.MissingAnnotationException;
-import de.tiiita.cli.exception.NoArgumentFoundException;
+import de.tiiita.Logger;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +16,9 @@ class CommandProcessor {
    * @param args the parsed command arguments.
    */
   void process(Object command, List<ArgumentModel> args) {
-    injectArguments(command, args);
+    if (!injectArguments(command, args)) {
+      return;
+    }
     try {
       ((Callable<?>) command).call();
     } catch (Exception e) {
@@ -35,24 +36,26 @@ class CommandProcessor {
    *
    * @param command the command instance
    * @param args the arguments models parsed by the parser.
+   * @return true if the operation was successful, false if not. Error handling
+   * is inside this method.
    */
-  private void injectArguments(Object command, List<ArgumentModel> args) {
+  private boolean injectArguments(Object command, List<ArgumentModel> args) {
     for (Field declaredField : command.getClass().getDeclaredFields()) {
       if (!declaredField.isAnnotationPresent(Argument.class)) {
         continue;
       }
 
       Argument argumentAnnotation = declaredField.getAnnotation(Argument.class);
-
       declaredField.setAccessible(true);
       try {
         ArgumentModel argByName = getArgByName(argumentAnnotation.name(), args);
         if (!argumentAnnotation.optional() && argByName == null) {
-          System.out.println(CommandService.getUsage(command));
+          System.out.println("Use => " + CommandService.getUsage(command));
+          return false;
         }
 
         if (argByName != null && argByName.getValue() != null) {
-          declaredField.set(this, argByName.getValue());
+          declaredField.set(command, argByName.getValue());
         }
 
       } catch (IllegalAccessException e) {
@@ -60,6 +63,7 @@ class CommandProcessor {
       }
     }
 
+    return true;
   }
 
 
