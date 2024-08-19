@@ -2,10 +2,12 @@ package de.tiiita.cli;
 
 import de.tiiita.cli.ArgumentModel;
 import de.tiiita.cli.CommandProcessor;
+import de.tiiita.cli.exception.CommandNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -26,9 +28,11 @@ class CommandParser {
    * @param input the console input
    * @return the parsed string as a map with 1 entry. The key is the command as a callable and the
    * value is a list of the arguments as models that can be used in code. Null of no command was found.
+   * @throws CommandNotFoundException if the command could not be found by the given input,
+   * you need to handle this exception to for example show your own not found message.
    */
-  @Nullable
-  Map<CliCommand, List<ArgumentModel>> parse(String input) {
+  @NotNull
+  Map<CliCommand, List<ArgumentModel>> parse(String input) throws CommandNotFoundException {
     String[] inputSplit = input.split(" ");
     for (CliCommand command : CommandService.getCommands()) {
       processor.validateAnnotations(command);
@@ -41,8 +45,8 @@ class CommandParser {
 
       }
     }
-    System.out.println("No command found");
-    return null;
+
+    throw new CommandNotFoundException("No command found from parsed input: " + input);
   }
 
   /**

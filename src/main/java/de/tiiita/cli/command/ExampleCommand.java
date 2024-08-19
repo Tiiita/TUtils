@@ -12,7 +12,6 @@ import de.tiiita.cli.Command;
 @Command(name = "example", description = "Optional test description")
 public class ExampleCommand extends CliCommand {
 
-
   //Define an argument that is required and has the name show
   @Argument(name = "-a", optional = false)
   private String showArgument;

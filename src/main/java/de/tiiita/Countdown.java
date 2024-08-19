@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Deprecated
+@Deprecated()
 public class Countdown {
     private final Duration duration;
     private long counter;

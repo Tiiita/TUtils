@@ -1,7 +1,7 @@
 package de.tiiita.cli;
 
-import de.tiiita.cli.ArgumentModel;
-import de.tiiita.cli.CommandProcessor;
+import de.tiiita.cli.exception.CommandNotFoundException;
+import de.tiiita.cli.exception.CommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,17 +32,18 @@ public class CommandService {
    * Starts listen to the console for input. This blocks the current thread until the scanner found
    * a next line {@link Scanner#nextLine()}. The found line will then be parsed and processed by the
    * {@link CommandProcessor}.
+   * @throws CommandNotFoundException if the command could not be found by the console input parser.
+   * you should handle this exception by printing a not found message to the console for example.
+   * @throws CommandSyntaxException if the command was found but the syntax were wrong, this exception
+   * gets thrown. The exception message holds the right usage you can print or whatever.
    */
-  public static void listen() {
+  public static void listen() throws CommandNotFoundException, CommandSyntaxException {
     String input = new Scanner(System.in).nextLine();
     if (input.isBlank()) {
       return;
     }
 
     Map<CliCommand, List<ArgumentModel>> parsedInput = parser.parse(input);
-    if (parsedInput == null) {
-      return;
-    }
 
     Entry<CliCommand, List<ArgumentModel>> next = parsedInput.entrySet().iterator().next();
     processor.process(next.getKey(), next.getValue());

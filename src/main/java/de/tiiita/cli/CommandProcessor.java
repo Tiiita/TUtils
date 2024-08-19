@@ -1,5 +1,7 @@
 package de.tiiita.cli;
 
+import de.tiiita.cli.exception.CommandSyntaxException;
+import de.tiiita.cli.exception.MissingAnnotationException;
 import java.lang.reflect.Field;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -7,16 +9,17 @@ import org.jetbrains.annotations.Nullable;
 class CommandProcessor {
 
   /**
-   * Injects the parsed arguments into the command instance {@link #injectArguments(Object, List)}.
-   * It then calls the super method of callable which executes the command implementation.
+   * Injects the parsed arguments into the command instance
+   * {@link #injectArguments(CliCommand, List)}. It then calls the super method of callable which
+   * executes the command implementation.
    *
    * @param command the command instance
    * @param args    the parsed command arguments.
    */
-  protected void process(CliCommand command, List<ArgumentModel> args) {
-    if (!injectArguments(command, args)) {
-      return;
-    }
+  protected void process(CliCommand command, List<ArgumentModel> args)
+      throws CommandSyntaxException {
+
+    injectArguments(command, args);
     try {
       CliCommand cliCommand = (CliCommand) command;
 
@@ -48,10 +51,12 @@ class CommandProcessor {
    *
    * @param command the command instance
    * @param args    the arguments models parsed by the parser.
-   * @return true if the operation was successful, false if not. Error handling is inside this
-   * method.
+   * @throws CommandSyntaxException if the command syntax was wrong. The exception message holds the
+   *                                right usage message, you can print when handling.
    */
-  private boolean injectArguments(CliCommand command, List<ArgumentModel> args) {
+  private void injectArguments(CliCommand command, List<ArgumentModel> args)
+      throws CommandSyntaxException {
+
     for (Field declaredField : command.getClass().getDeclaredFields()) {
       if (!declaredField.isAnnotationPresent(Argument.class)) {
         continue;
@@ -62,8 +67,7 @@ class CommandProcessor {
       try {
         ArgumentModel argByName = getArgByName(argumentAnnotation.name(), args);
         if (!argumentAnnotation.optional() && argByName == null) {
-          System.out.println("Use => " + CommandService.getUsage(command));
-          return false;
+          throw new CommandSyntaxException(CommandService.getUsage(command));
         }
 
         if (argByName != null && argByName.getValue() != null) {
@@ -74,8 +78,6 @@ class CommandProcessor {
         throw new RuntimeException(e);
       }
     }
-
-    return true;
   }
 
 
@@ -98,11 +100,12 @@ class CommandProcessor {
   }
 
   /**
-   * This simple method validates the command instance has the command annotation, so
-   * we do not get unexplainable errors in the later process.
+   * This simple method validates the command instance has the command annotation, so we do not get
+   * unexplainable errors in the later process.
+   *
    * @param command the command instance.
    */
-   void validateAnnotations(Object command) {
+  void validateAnnotations(Object command) {
     if (!command.getClass().isAnnotationPresent(Command.class)) {
       throw new MissingAnnotationException("Command class has to have CliCommand.class annotation");
     }
