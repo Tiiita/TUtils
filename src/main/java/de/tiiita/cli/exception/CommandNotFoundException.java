@@ -1,6 +1,6 @@
 package de.tiiita.cli.exception;
 
-public class CommandNotFoundException extends RuntimeException {
+public class CommandNotFoundException extends Exception {
 
   public CommandNotFoundException(String message) {
     super(message);
