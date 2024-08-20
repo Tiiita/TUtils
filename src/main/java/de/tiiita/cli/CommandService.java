@@ -43,10 +43,7 @@ public class CommandService {
       return;
     }
 
-    Map<CliCommand, List<ArgumentModel>> parsedInput = parser.parse(input);
-
-    Entry<CliCommand, List<ArgumentModel>> next = parsedInput.entrySet().iterator().next();
-    processor.process(next.getKey(), next.getValue());
+    processor.process(parser.parse(input));
   }
 
   /**
@@ -89,7 +86,7 @@ public class CommandService {
   }
 
 
-  private static List<Argument> getArgumentsSorted(Object command) {
+  static List<Argument> getArgumentsSorted(Object command) {
     return Arrays.stream(command.getClass().getDeclaredFields())
         .filter(field -> field.isAnnotationPresent(Argument.class))
         .map(field -> field.getAnnotation(Argument.class))

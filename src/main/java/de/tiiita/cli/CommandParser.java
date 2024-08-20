@@ -1,12 +1,15 @@
 package de.tiiita.cli;
 
-import de.tiiita.cli.ArgumentModel;
-import de.tiiita.cli.CommandProcessor;
+import de.tiiita.Collections;
+import de.tiiita.Logger;
 import de.tiiita.cli.exception.CommandNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,12 +30,14 @@ class CommandParser {
    *
    * @param input the console input
    * @return the parsed string as a map with 1 entry. The key is the command as a callable and the
-   * value is a list of the arguments as models that can be used in code. Null of no command was found.
-   * @throws CommandNotFoundException if the command could not be found by the given input,
-   * you need to handle this exception to for example show your own not found message.
+   * value is a list of the arguments as models that can be used in code. Null of no command was
+   * found.
+   * @throws CommandNotFoundException if the command could not be found by the given input, you need
+   *                                  to handle this exception to for example show your own not
+   *                                  found message.
    */
   @NotNull
-  Map<CliCommand, List<ArgumentModel>> parse(String input) throws CommandNotFoundException {
+  ProcessableInput parse(String input) throws CommandNotFoundException {
     String[] inputSplit = input.split(" ");
     for (CliCommand command : CommandService.getCommands()) {
       processor.validateAnnotations(command);
@@ -40,9 +45,13 @@ class CommandParser {
       if (command.getClass().getAnnotation(Command.class).name()
           .equalsIgnoreCase(inputSplit[0])) {
 
+        //found right command
         String[] args = Arrays.copyOfRange(inputSplit, 1, inputSplit.length);
-        return Map.of(command, getArguments(args));
 
+        List<ArgumentModel> parsedArguments = parseArguments(Arrays.asList(args),
+            CommandService.getArgumentsSorted(command));
+
+        return new ProcessableInput(parsedArguments, inputSplit, command);
       }
     }
 
@@ -57,10 +66,39 @@ class CommandParser {
    * @return the converted arguments or an empty list of no arguments where given.
    */
 
-  private List<ArgumentModel> getArguments(String[] inputArgs) {
+  private List<ArgumentModel> parseArguments(List<String> inputArgs, List<Argument> needed) {
     List<ArgumentModel> arguments = new ArrayList<>();
+    //Search in the input after needed arguments.
 
-    for (int i = 0; i < inputArgs.length; i += 2) {
+    needed.forEach(neededArg -> {
+      for (int i = 0; i < inputArgs.size(); i++) {
+
+        String currentInputArg = inputArgs.get(i);
+
+        String nextInputArg = Collections.getOrNull(inputArgs, i + 1);
+
+        if (!currentInputArg.equalsIgnoreCase(neededArg.name())) {
+          continue;
+        }
+
+        ArgumentModel argumentModel = new ArgumentModel();
+        argumentModel.setName(currentInputArg);
+
+        if (neededArg.valued()) {
+          argumentModel.setValue(nextInputArg);
+        } else {
+          argumentModel.setValued(true);
+        }
+
+        arguments.add(argumentModel);
+      }
+    });
+    arguments.forEach(argumentModel -> {
+      Logger.logDebug(argumentModel.toString());
+    });
+    return arguments;
+
+   /* for (int i = 0; i < inputArgs.length; i += 2) {
       ArgumentModel argument = new ArgumentModel();
       argument.setName(inputArgs[i]);
 
@@ -73,7 +111,7 @@ class CommandParser {
       arguments.add(argument);
     }
 
-    return arguments;
+    return arguments;*/
   }
 }
 

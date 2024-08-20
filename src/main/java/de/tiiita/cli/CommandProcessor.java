@@ -1,8 +1,10 @@
 package de.tiiita.cli;
 
+import de.tiiita.Logger;
 import de.tiiita.cli.exception.CommandSyntaxException;
 import de.tiiita.cli.exception.MissingAnnotationException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,33 +15,35 @@ class CommandProcessor {
    * {@link #injectArguments(CliCommand, List)}. It then calls the super method of callable which
    * executes the command implementation.
    *
-   * @param command the command instance
-   * @param args    the parsed command arguments.
+   * @param processableInput the data class which contains all information needed to process.
    */
-  protected void process(CliCommand command, List<ArgumentModel> args)
+  protected void process(ProcessableInput processableInput)
       throws CommandSyntaxException {
 
-    injectArguments(command, args);
-    try {
-      CliCommand cliCommand = (CliCommand) command;
+    CliCommand command = processableInput.getCommand();
+    List<ArgumentModel> args = processableInput.getParsedArguments();
 
-      for (CliCommand subCommand : cliCommand.getSubCommands()) {
-        for (ArgumentModel arg : args) {
-          Command commandAnnotation = subCommand.getClass().getAnnotation(Command.class);
-          if (!commandAnnotation.name().equalsIgnoreCase(arg.getName())) {
-            continue;
-          }
-
-          subCommand.execute();
-        }
+    for (CliCommand subCommand : command.getSubCommands()) {
+      if (isSubCommandInRawInput(processableInput.getRawInput(), subCommand)) {
+        subCommand.execute();
+        return;
       }
-
-      cliCommand.execute();
-
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
+
+    injectArguments(command, args);
+    command.execute();
+  }
+
+  private boolean isSubCommandInRawInput(String[] rawInput, CliCommand subCommand) {
+    for (String inputArg : rawInput) {
+      Command subCommandAnnotation = subCommand.getClass().getAnnotation(Command.class);
+
+      if (inputArg.equalsIgnoreCase(subCommandAnnotation.name())) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -49,12 +53,12 @@ class CommandProcessor {
    * print. If the value of the argument is null it will not inject anything into the declared
    * variable, which means the default value will stay.
    *
-   * @param command the command instance
-   * @param args    the arguments models parsed by the parser.
+   * @param command    the command instance
+   * @param parsedArgs the arguments models parsed by the parser.
    * @throws CommandSyntaxException if the command syntax was wrong. The exception message holds the
    *                                right usage message, you can print when handling.
    */
-  private void injectArguments(CliCommand command, List<ArgumentModel> args)
+  private void injectArguments(CliCommand command, List<ArgumentModel> parsedArgs)
       throws CommandSyntaxException {
 
     for (Field declaredField : command.getClass().getDeclaredFields()) {
@@ -65,21 +69,31 @@ class CommandProcessor {
       Argument argumentAnnotation = declaredField.getAnnotation(Argument.class);
       declaredField.setAccessible(true);
       try {
-        ArgumentModel argByName = getArgByName(argumentAnnotation.name(), args);
-        if (!argumentAnnotation.optional() && argByName == null) {
+        ArgumentModel givenArgument = getArgByName(argumentAnnotation.name(), parsedArgs);
+
+        //Is null if we pass in an argument that is not defined,
+        //or we do not pass in an argument that is needed.
+        if (!argumentAnnotation.optional() && givenArgument == null) {
+          //Example cmd: '-a' is missing
           throw new CommandSyntaxException(CommandService.getUsage(command));
         }
 
-        if (argByName != null && argByName.getValue() != null) {
-          declaredField.set(command, argByName.getValue());
+        if (givenArgument == null) {
+          return;
         }
+
+        if (argumentAnnotation.valued()) {
+          declaredField.set(command, givenArgument.getValue());
+          continue;
+        }
+
+        declaredField.setBoolean(command, givenArgument.isValued());
 
       } catch (IllegalAccessException e) {
         throw new RuntimeException(e);
       }
     }
   }
-
 
   /**
    * This is just a simple method to get an argument by its name.

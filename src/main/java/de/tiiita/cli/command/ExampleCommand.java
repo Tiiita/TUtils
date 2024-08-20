@@ -13,18 +13,17 @@ import de.tiiita.cli.Command;
 public class ExampleCommand extends CliCommand {
 
   //Define an argument that is required and has the name show
-  @Argument(name = "-a", optional = false)
+  @Argument(name = "-a", optional = false, valued = true)
   private String showArgument;
 
   //Define another argument with the name test, this one is optional
-  @Argument(name = "-b", optional = true)
-  private String testArgument;
+  @Argument(name = "-b", optional = true, valued = false)
+  private boolean testArgument;
 
 
   public ExampleCommand() {
     //Add a sub command
     addSub(new ExampleSubCommand());
-    addSub(new HelpCommand());
   }
 
   @Override
