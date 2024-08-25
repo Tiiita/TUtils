@@ -1,8 +1,8 @@
-package de.tiiita.cli.command;
+package de.tiiita.shell.command;
 
-import de.tiiita.cli.Argument;
-import de.tiiita.cli.CliCommand;
-import de.tiiita.cli.Command;
+import de.tiiita.shell.Argument;
+import de.tiiita.shell.ShellCommand;
+import de.tiiita.shell.Command;
 
 /**
  * This is an example of how your command could look like.
@@ -10,15 +10,15 @@ import de.tiiita.cli.Command;
 
 //Set the command name and description
 @Command(name = "example", description = "Optional test description")
-public class ExampleCommand extends CliCommand {
+public class ExampleCommand extends ShellCommand {
 
   //Define an argument that is required and has the name show
   @Argument(name = "-a", optional = false, valued = true)
-  private String showArgument;
+  private String aArgument;
 
   //Define another argument with the name test, this one is optional
   @Argument(name = "-b", optional = true, valued = false)
-  private boolean testArgument;
+  private boolean bArgument;
 
 
   public ExampleCommand() {
@@ -32,6 +32,6 @@ public class ExampleCommand extends CliCommand {
     //logic here as well!
 
     System.out.println("Test command executed, injected arguments: "
-        + showArgument + ", " + testArgument);
+        + aArgument + ", " + bArgument);
   }
 }

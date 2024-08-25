@@ -1,40 +1,52 @@
-package de.tiiita.cli;
+package de.tiiita.shell;
 
-import de.tiiita.Logger;
-import de.tiiita.cli.exception.CommandSyntaxException;
-import de.tiiita.cli.exception.MissingAnnotationException;
+import de.tiiita.Collections;
+import de.tiiita.StringUtils;
+import de.tiiita.shell.exception.CommandNotFoundException;
+import de.tiiita.shell.exception.CommandSyntaxException;
+import de.tiiita.shell.exception.MissingAnnotationException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.jetbrains.annotations.Nullable;
 
 class CommandProcessor {
 
+  private final Map<Field, Object> fieldValueMap = new HashMap<>();
+
   /**
-   * Injects the parsed arguments into the command instance
-   * {@link #injectArguments(CliCommand, List)}. It then calls the super method of callable which
-   * executes the command implementation.
+   * This method can process the parsed input. If the command has sub commands it will recursive
+   * process the sub command as normal command. This also works with sub commands of sub commands.
+   * Using valued and non-valued you can make any kind of command hierarchy.
+   * <p></p>
+   * This will also inject the value of the user input into the argument fields.
    *
-   * @param processableInput the data class which contains all information needed to process.
+   * @param input the data class which contains all information needed to process.
    */
-  protected void process(ProcessableInput processableInput)
-      throws CommandSyntaxException {
+  void process(ProcessableInput input)
+      throws CommandSyntaxException, CommandNotFoundException {
 
-    CliCommand command = processableInput.getCommand();
-    List<ArgumentModel> args = processableInput.getParsedArguments();
+    ShellCommand command = input.getCommand();
+    List<ArgumentModel> args = input.getParsedArguments();
+    String[] rawInput = input.getRawInput();
 
-    for (CliCommand subCommand : command.getSubCommands()) {
-      if (isSubCommandInRawInput(processableInput.getRawInput(), subCommand)) {
-        subCommand.execute();
-        return;
+    for (ShellCommand subCommand : command.getSubCommands()) {
+      if (isSubCommandInRawInput(rawInput, subCommand)) {
+        //Recursive move through sub command hierarchy until list
+        // end and run the sub command as normal
+        rawInput = Collections.removeFromArray(rawInput, 0);
+        process(new ProcessableInput(args, rawInput, subCommand));
       }
     }
 
-    injectArguments(command, args);
+    inject(command, args);
     command.execute();
+    uninject(command);
   }
 
-  private boolean isSubCommandInRawInput(String[] rawInput, CliCommand subCommand) {
+  private boolean isSubCommandInRawInput(String[] rawInput, ShellCommand subCommand) {
     for (String inputArg : rawInput) {
       Command subCommandAnnotation = subCommand.getClass().getAnnotation(Command.class);
 
@@ -44,6 +56,23 @@ class CommandProcessor {
     }
 
     return false;
+  }
+
+
+  /**
+   * This resets the value of each field that it was before injection.
+   * @param command the command, must be the same that  {@link #inject(ShellCommand, List)} used.
+   */
+  private void uninject(ShellCommand command) {
+    for (Entry<Field, Object> entry : fieldValueMap.entrySet()) {
+      try {
+        entry.getKey().set(command, entry.getValue());
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    fieldValueMap.clear();
   }
 
   /**
@@ -58,7 +87,7 @@ class CommandProcessor {
    * @throws CommandSyntaxException if the command syntax was wrong. The exception message holds the
    *                                right usage message, you can print when handling.
    */
-  private void injectArguments(CliCommand command, List<ArgumentModel> parsedArgs)
+  private void inject(ShellCommand command, List<ArgumentModel> parsedArgs)
       throws CommandSyntaxException {
 
     for (Field declaredField : command.getClass().getDeclaredFields()) {
@@ -82,6 +111,7 @@ class CommandProcessor {
           return;
         }
 
+        fieldValueMap.put(declaredField, declaredField.get(command));
         if (argumentAnnotation.valued()) {
           declaredField.set(command, givenArgument.getValue());
           continue;

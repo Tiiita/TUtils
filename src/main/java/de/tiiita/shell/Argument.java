@@ -1,4 +1,4 @@
-package de.tiiita.cli;
+package de.tiiita.shell;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

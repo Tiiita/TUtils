@@ -1,4 +1,4 @@
-package de.tiiita.cli.exception;
+package de.tiiita.shell.exception;
 
 public class MissingAnnotationException extends RuntimeException {
 

@@ -1,9 +1,8 @@
-package de.tiiita.cli.command;
+package de.tiiita.shell.command;
 
-import de.tiiita.cli.CliCommand;
-import de.tiiita.cli.Command;
-import de.tiiita.cli.CommandService;
-import java.util.concurrent.Callable;
+import de.tiiita.shell.ShellCommand;
+import de.tiiita.shell.Command;
+import de.tiiita.shell.CommandService;
 
 /**
  * This is the default help command. You can just register this in your project
@@ -12,15 +11,17 @@ import java.util.concurrent.Callable;
  * you have to use the right import for the right help command!
  */
 @Command(name = "help", description = "Show all commands and their description")
-public class HelpCommand extends CliCommand {
+public class HelpCommand extends ShellCommand {
 
   @Override
   public void execute() {
     System.out.println("=== HELP ===");
-    for (CliCommand command : CommandService.getCommands()) {
-      Command commandAnnotation = command.getClass().getAnnotation(Command.class);
-      String commandHelp = commandAnnotation.name() + " - " + commandAnnotation.description();
-      System.out.println(commandHelp);
+    System.out.println("Type the command name to see the syntax!");
+    System.out.println(" ");
+
+    for (ShellCommand command : CommandService.getCommands()) {
+      Command annotation = command.getClass().getAnnotation(Command.class);
+      System.out.println(annotation.name() + " - " + annotation.description());
     }
     System.out.println(" ");
   }

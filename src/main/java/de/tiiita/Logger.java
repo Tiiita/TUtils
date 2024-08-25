@@ -83,7 +83,19 @@ public class Logger {
 
     String uncoloredLog = formattedDate + logType.toUpperCase() + ":";
 
+    String colorWhite = "\u001B[0m";
     return color == null ? uncoloredLog
-        : formattedDate + color + logType.toUpperCase() + "\u001B[0m" + ":";
+        :colorWhite + formattedDate + color + logType.toUpperCase() + colorWhite + ":";
+  }
+
+
+  public static String getAnsiGreen() {
+    return ANSI_GREEN;
+  }
+  public static String getAnsiRed() {
+    return ANSI_RED;
+  }
+  public static String getAnsiYellow() {
+    return ANSI_YELLOW;
   }
 }

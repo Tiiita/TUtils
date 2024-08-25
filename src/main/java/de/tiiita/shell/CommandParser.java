@@ -1,17 +1,12 @@
-package de.tiiita.cli;
+package de.tiiita.shell;
 
 import de.tiiita.Collections;
 import de.tiiita.Logger;
-import de.tiiita.cli.exception.CommandNotFoundException;
+import de.tiiita.shell.exception.CommandNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -39,7 +34,7 @@ class CommandParser {
   @NotNull
   ProcessableInput parse(String input) throws CommandNotFoundException {
     String[] inputSplit = input.split(" ");
-    for (CliCommand command : CommandService.getCommands()) {
+    for (ShellCommand command : CommandService.getCommands()) {
       processor.validateAnnotations(command);
 
       if (command.getClass().getAnnotation(Command.class).name()
@@ -93,25 +88,9 @@ class CommandParser {
         arguments.add(argumentModel);
       }
     });
-    arguments.forEach(argumentModel -> {
-      Logger.logDebug(argumentModel.toString());
-    });
+
     return arguments;
 
-   /* for (int i = 0; i < inputArgs.length; i += 2) {
-      ArgumentModel argument = new ArgumentModel();
-      argument.setName(inputArgs[i]);
-
-      if (i + 1 < inputArgs.length) {
-        argument.setValue(inputArgs[i + 1]);
-      } else {
-        argument.setValue(null);
-      }
-
-      arguments.add(argument);
-    }
-
-    return arguments;*/
   }
 }
 

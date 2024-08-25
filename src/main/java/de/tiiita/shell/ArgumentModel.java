@@ -1,7 +1,5 @@
-package de.tiiita.cli;
+package de.tiiita.shell;
 
-
-import java.util.Optional;
 
 /**
  * This represents a command argument so you can get information easier.

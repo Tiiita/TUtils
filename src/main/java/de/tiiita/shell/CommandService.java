@@ -1,13 +1,11 @@
-package de.tiiita.cli;
+package de.tiiita.shell;
 
-import de.tiiita.cli.exception.CommandNotFoundException;
-import de.tiiita.cli.exception.CommandSyntaxException;
+import de.tiiita.shell.exception.CommandNotFoundException;
+import de.tiiita.shell.exception.CommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -19,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CommandService {
 
-  private static final List<CliCommand> commands = new ArrayList<>();
+  private static final List<ShellCommand> commands = new ArrayList<>();
   private static final CommandParser parser;
   private static final CommandProcessor processor;
 
@@ -53,7 +51,7 @@ public class CommandService {
    * @param command the command instance. This has implement {@link Callable} and needs to have the
    *                {@link Command} annotation, otherwise an exception is being thrown.
    */
-  public static void register(@NotNull CliCommand command) {
+  public static void register(@NotNull ShellCommand command) {
     commands.add(command);
   }
 
@@ -63,7 +61,7 @@ public class CommandService {
    * @param command the command instance.
    * @return the usage of the command
    */
-  public static String getUsage(CliCommand command) {
+  public static String getUsage(ShellCommand command) {
     StringBuilder usageBuilder = new StringBuilder();
     usageBuilder.append(command.getClass().getAnnotation(Command.class).name());
     String subCommandPart = command.getSubCommands().isEmpty() ? ""
@@ -94,7 +92,10 @@ public class CommandService {
         .collect(Collectors.toList());
   }
 
-  public static List<CliCommand> getCommands() {
+   static CommandParser getParser() {
+    return parser;
+  }
+  public static List<ShellCommand> getCommands() {
     return new ArrayList<>(commands);
   }
 }

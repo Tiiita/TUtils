@@ -3,7 +3,7 @@ package de.tiiita.minecraft.util;
 import com.google.gson.JsonElement;
 import de.tiiita.Logger;
 import de.tiiita.StringUtils;
-import de.tiiita.ThreadUtils;
+import de.tiiita.Threads;
 import net.md_5.bungee.api.ProxyServer;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,7 +34,7 @@ public class MojangProfileFetcher {
      */
     @Nullable
     private static String fetchData(String identifier) throws IOException {
-        ThreadUtils.asyncOnly();
+        Threads.asyncOnly();
 
         HttpGet httpGet = new HttpGet(String.format(getUrlByIdIdentifier(identifier), identifier));
 
